@@ -23,8 +23,7 @@ Appverse Web Client Side security module based on HTML5 and Java Script
 * Install bower `npm install -g bower`
 
 ####Inside of your app:
-* Run `bower install appverse-web-html5-core`
-* Run `bower install appverse-web-html5-security`
+* Run `bower install appverse-web-html5-security -s`
 * Add the following to your index.html
 ```html
 
