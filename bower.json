@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "main": "src/modules/api-security.js",
   "dependencies": {
-    "appverse-web-html5-core": "0.2.0",
+    "appverse-web-html5-core": "0.2.0"
     
   },
   "devDependencies": {
@@ -12,7 +12,6 @@
     "angular-scenario": "1.0.8"
   },
   "resolutions": {
-    "angular": "1.2.1"    
   },
   "ignore": [
     "**/.*",
