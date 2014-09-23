@@ -41,8 +41,9 @@
     "karma": "~0.12.0",
     "karma-ng-html2js-preprocessor": "~0.1.0",
     "karma-coverage": "~0.1.4",
-    "grunt-docular": "~0.1.2",
-    "grunt-bump": "0.0.15"
+    "grunt-docular": "~0.2.2",
+    "grunt-bump": "0.0.15",
+    "grunt-maven-tasks": "~1.3.0"
   },
   "engines": {
     "node": ">=0.8.0"

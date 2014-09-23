@@ -5,13 +5,10 @@
   "main": "src/modules/api-security.js",
   "dependencies": {
     "appverse-web-html5-core": "0.2.0"
-    
   },
   "devDependencies": {
     "angular-mocks": "1.0.8",
     "angular-scenario": "1.0.8"
-  },
-  "resolutions": {
   },
   "ignore": [
     "**/.*",
@@ -22,11 +19,11 @@
     "Gruntfile.js",
     "angus-site",
     "docs-generation",
-    "appverse-html5-examples",    
+    "appverse-html5-examples",
     "karma.conf.js",
     "karma-e2e.conf.js",
     "package.json",
     "sonar-project.properties",
     "changelog.js"
-]
+  ]
 }
