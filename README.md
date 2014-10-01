@@ -53,7 +53,7 @@ Appverse Web Client Side security module based on HTML5 and Java Script
     <script src="bower_components/appverse-web-html5-core/src/modules/api-translate.js"></script>
     <script src="bower_components/angular-translate/angular-translate.min.js"></script>
     <script src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>
-    <script src="bower_components/angular-dynamic-locale/src/tmhDinamicLocale.js"></script>
+    <script src="bower_components/angular-dynamic-locale/src/tmhDynamicLocale.js"></script>
 
     <script src="bower_components/appverse-web-html5-core/src/modules/api-utils.js"></script>
 
