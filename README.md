@@ -38,8 +38,8 @@ Appverse Web Client Side security module based on HTML5 and Java Script
     <script src="bower_components/jquery-flot/jquery.flot.time.js"></script>
 
     <!-- uibootstrap -->
-    <script src="bower_components/bootstrap-sass/js/transition.js"></script>
-    <script src="bower_components/bootstrap-sass/js/collapse.js"></script>
+    <script src="bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/transition.js"></script>
+    <script src="bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/collapse.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 
     <!-- modules -->
