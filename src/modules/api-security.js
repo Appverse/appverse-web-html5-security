@@ -125,11 +125,66 @@ angular.module('AppSecurity', [
     'AppREST'
 ])
 
+.config(['$provide', '$httpProvider', function($provide, $httpProvider) {
 
-.run(['$log',
-            function ($log) {
-        $log.info('AppSecurity run');
-            }])
+    function oauthResponseInterceptor ($q, $log, $injector) {
+
+        return {
+
+            'response': function(response) {
+
+                // Injected manually because of a circular dependency problem:
+                // $http -> interceptor -> Oauth_AccessToken -> CacheFactory -> $http
+                // Circular dependencies appear when app design mixes concerns.
+                // TODO: Redesign architecture.
+                var oauthAccessTokenService = $injector.get('Oauth_AccessToken');
+
+                // Retrieves bearer/oauth token from header
+                var tokenInHeader = response.headers('X-XSRF-Cookie');
+                $log.debug('X-XSRF-Cookie: ' + tokenInHeader);
+                if (tokenInHeader) {
+                    oauthAccessTokenService.setFromHeader(tokenInHeader);
+                }
+                 return response;
+            }
+
+        };
+    }
+    oauthResponseInterceptor.$inject =  ['$q', '$log', '$injector'];
+
+    $provide.factory('oauthResponseInterceptor', oauthResponseInterceptor);
+    $httpProvider.interceptors.push('oauthResponseInterceptor');
+
+
+    var logsOutUserOn401 = ['$q', '$location', function ($q, $location) {
+        var success = function (response) {
+            return response;
+        };
+
+        var error = function (response) {
+            if (response.status === 401) {
+                //Redirects them back to main/login page
+                $location.path('/home');
+
+                return $q.reject(response);
+            } else {
+                return $q.reject(response);
+            }
+        };
+
+        return function (promise) {
+            return promise.then(success, error);
+        };
+    }];
+
+    $httpProvider.responseInterceptors.push(logsOutUserOn401);
+
+}])
+
+
+.run(['$log', function ($log) {
+    $log.info('AppSecurity run');
+}])
 
 /**
  * @ngdoc service
@@ -263,13 +318,13 @@ angular.module('AppSecurity', [
         factory.set = function (scope) {
             setTokenFromString(scope); // take the token from the query string and eventually save it in the cookies
             setTokenFromCookies(scope); // take the from the cookies
-            return token
+            return token;
         };
 
 
         factory.setFromHeader = function (token) {
             setTokenInCurrentUser(token);
-            return token
+            return token;
         };
 
         /**
