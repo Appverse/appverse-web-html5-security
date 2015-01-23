@@ -23,13 +23,13 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		yeoman: yeomanConfig,		
+		yeoman: yeomanConfig,
 		maven: {
 			options: {
                 goal:'install',
 				groupId: 'org.appverse.web.framework.modules.frontend.html5',
 				releaseRepository: 'url'
-				
+
 			},
 			'install-src': {
 				options: {
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
 				files: [{src: ['<%= yeoman.app %>/**','<%= yeoman.app %>/!bower_components/**'], dest: ''}]
 			},
 			'install-min': {
-				options: {					
+				options: {
 					classifier: 'min'
 				},
 				files: [{src: ['<%= yeoman.dist %>/**'], dest: ''}]
@@ -80,13 +80,13 @@ module.exports = function (grunt) {
                     dest: '.tmp/styles/'
                 }]
             }
-        },       
+        },
         clean: {
             dist: {
                 files: [{
                     dot: true,
                     src: [
-                        '.tmp',				
+                        '.tmp',
                         '<%= yeoman.dist %>/**',
                         '!<%= yeoman.dist %>/.git*'
                     ]
@@ -159,11 +159,11 @@ module.exports = function (grunt) {
 			},
             dist: {
 				files: {
-                   
+
 
 					'<%= yeoman.dist %>/modules/api-security.min.js':['<%= yeoman.app %>/modules/api-security.js'],
 					'<%= yeoman.dist %>/directives/oauth-directives.min.js':['<%= yeoman.app %>/directives/oauth-directives.js'],
-                   
+
                 }
             }
         },
@@ -257,7 +257,7 @@ module.exports = function (grunt) {
                 dest: '<%= yeoman.dist %>',
                 src: 'images/**/*.png'
             }
-        },        
+        },
         karma: {
             unit: {
                 configFile: 'karma.conf.js',
@@ -345,9 +345,9 @@ module.exports = function (grunt) {
 
     grunt.registerTask('doc', [
 		'clean:docular',
-        'docular'        
+        'docular'
     ]);
-	
+
 	grunt.registerTask('test',[
 		'jshint',
 		'clean',
@@ -356,27 +356,27 @@ module.exports = function (grunt) {
 
     grunt.registerTask('dist', [
         'clean:dist',
-        'autoprefixer',     
+        'autoprefixer',
         'copy:dist',
         'cdnify',
-        'ngAnnotate',        
-        'uglify',        
+        'ngAnnotate',
+        'uglify',
         'htmlmin'
     ]);
 
-    grunt.registerTask('install', [ 
-        'clean', 
+    grunt.registerTask('install', [
+        'clean',
 		'maven:install-src',
-		'dist', 
+		'dist',
         'maven:install-min'
     ]);
-	grunt.registerTask('deploy', [ 
-        'clean', 
+	grunt.registerTask('deploy', [
+        'clean',
 		'maven:deploy-src',
-		'dist', 
+		'dist',
         'maven:deploy-min'
     ]);
-    
+
     grunt.registerTask('default', [
         'dist'
     ]);
