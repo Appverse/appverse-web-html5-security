@@ -12,7 +12,7 @@
      * OAuth Endpoint service.
      * Contains one factory managing the authorization's (endpoint) URL.
      */
-    function OauthEndpointFactory (AccessToken, $location) {
+    function OauthEndpointFactory ($location) {
 
         var factory = {};
         var url;

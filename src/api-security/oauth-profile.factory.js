@@ -13,11 +13,11 @@
      * @description
      * Profile model. *
      */
-    function OauthProfileFactory(RequestWrapper, $resource, SECURITY_OAUTH) {
+    function OauthProfileFactory(Oauth_RequestWrapper, $resource, SECURITY_OAUTH) {
         var resource = $resource(SECURITY_OAUTH.profile, {}, {
             //get: { method: 'JSONP', params: { callback: 'JSON_CALLBACK' } }
         });
-        return RequestWrapper.wrap(resource, ['get']);
+        return Oauth_RequestWrapper.wrapRequest(resource, ['get']);
     }
 
 })();

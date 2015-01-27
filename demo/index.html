@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Appverse HTML5 Security Demo</title>
+</head>
+
+<body data-ng-app="security-demo-app">
+    <h1>APPVERSE HTML5 Security demo</h1>
+
+    <h2>Directive</h2>
+    <oauth ng-cloak
+        site="http://myoauthserver.com"
+        client="e72c43c75adc9665e4d4c13354c41f337d5a2e439d3da1243bb47e39745f435c"
+        redirect="http://localhost:9000"
+        scope="resources"
+        profile="http://myoauthserver.com/me"
+        storage="cookies">Sign In
+    </oauth>
+
+    <!-- Dependencies: TODO - REMOVE ALL UNNECESSARY WHEN UPDATING TO appverse core 0.3 -->
+    <script src="jquery/dist/jquery.js"></script>
+    <script src="angular/angular.js"></script>
+    <script src="angular-cookies/angular-cookies.js"></script>
+    <script src="angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="angular-route/angular-route.js"></script>
+    <script src="angular-animate/angular-animate.js"></script>
+    <script src="angular-cache/dist/angular-cache.js"></script>
+    <script src="angular-resource/angular-resource.js"></script>
+    <script src="angular-touch/angular-touch.js"></script>
+    <script src="ng-grid/ng-grid-2.0.14.debug.js"></script>
+    <script src="angular-jqm.js"></script>
+    <script src="appverse-web-html5-core/src/modules/api-cache.js"></script>
+    <script src="appverse-web-html5-core/src/modules/api-configuration.js"></script>
+    <script src="appverse-web-html5-core/src/modules/api-detection.js"></script>
+    <script src="appverse-web-html5-core/src/modules/api-logging.js"></script>
+    <script src="appverse-web-html5-core/src/modules/api-main.js"></script>
+    <script src="appverse-web-html5-core/src/modules/api-utils.js"></script>
+    <script src="appverse-web-html5-core/src/modules/api-performance.js"></script>
+
+    <!-- ########## Core modules: autoinjected. Check gruntfile.js ########## -->
+    <!-- injector:js -->
+    <script src="api-security/module.js"></script>
+    <script src="api-security/authentication-service.factory.js"></script>
+    <script src="api-security/oauth-access-token.factory.js"></script>
+    <script src="api-security/oauth-endpoint.factory.js"></script>
+    <script src="api-security/oauth-profile.factory.js"></script>
+    <script src="api-security/oauth-request-wrapper.factory.js"></script>
+    <script src="api-security/oauth.directive.js"></script>
+    <script src="api-security/role-service.factory.js"></script>
+    <script src="api-security/user-service.factory.js"></script>
+    <!-- endinjector -->
+
+    <script>
+        angular.module('security-demo-app', ['COMMONAPI', 'AppSecurity'])
+        .run(function($log) {
+            //
+        });
+    </script>
+</body>
+
+</html>
