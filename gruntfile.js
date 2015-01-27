@@ -14,8 +14,11 @@ configPaths = {
     bowerComponents : bowerJson.directory || 'bower_components',
     demo : 'demo',
     dist: 'dist',
-    doc: 'doc'
+    doc: 'doc',
+    coverage: 'reports/coverage',
+    testsConfig : 'config/test'
 },
+
 // Define files to load in the demo, ordering and the way they are
 // concatenated for distribution
 files = {
@@ -72,6 +75,7 @@ module.exports = function (grunt) {
             }
         },
 
+        // Cleaning tasks
         clean: {
             dist: {
                 files: [{
@@ -83,6 +87,7 @@ module.exports = function (grunt) {
                     ]
                 }]
             },
+            coverage : '<%= configPaths.coverage %>/**',
             server: '.tmp',
             docular: 'doc'
         },
@@ -193,6 +198,19 @@ module.exports = function (grunt) {
                 }
             }
         },
+
+        // Karma Test runner
+        karma: {
+            unit: {
+                configFile: '<%= configPaths.testsConfig %>/karma.unit.conf.js',
+                autoWatch: false,
+                singleRun: true
+            },
+            unitAutoWatch: {
+                configFile: '<%= configPaths.testsConfig %>/karma.unit.watch.conf.js',
+                autoWatch: true
+            }
+        }
     });
 
     // ------ Demo tasks. Starts a webserver with a demo app -----
@@ -203,15 +221,43 @@ module.exports = function (grunt) {
         'watch:demoLiveReload'
     ]);
 
+    // ------ Dev tasks. To be run continously while developing -----
+
+    grunt.registerTask('dev', [
+        // For now, only execute unit tests when a file changes?
+        // midway and e2e are slow and do not give innmedate
+        // feedback after a change
+        'test:unit:watch'
+    ]);
+
+
+    // ------ Tests tasks -----
+
+    grunt.registerTask('test', [
+        'test:all'
+    ]);
+
+    grunt.registerTask('test:all', [
+        'clean:coverage',
+        'karma:unit'
+    ]);
+
+    grunt.registerTask('unit', [
+        'test:unit:once'
+    ]);
+
+    grunt.registerTask('test:unit:watch', [
+        'karma:unitAutoWatch'
+    ]);
+
+    grunt.registerTask('test:unit:once', [
+        'karma:unit'
+    ]);
+
+
     grunt.registerTask('doc', [
         'clean:docular',
         'docular'
-    ]);
-
-    grunt.registerTask('test',[
-        'jshint',
-        'clean',
-        'nodeunit'
     ]);
 
     grunt.registerTask('dist', [
@@ -258,8 +304,6 @@ function getAllFilesForDemo(filesObject) {
            filesList = filesList.concat(filesObject[key]);
         }
     }
-
-    console.log(filesList);
     return filesList;
 }
 
