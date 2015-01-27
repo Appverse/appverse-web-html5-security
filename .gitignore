@@ -6,4 +6,5 @@ dist
 .sonar/
 coverage/
 doc/
+*.log
 
