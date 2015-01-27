@@ -92,39 +92,6 @@ module.exports = function (grunt) {
             docular: 'doc'
         },
 
-        jshint: {
-            options: {
-                jshintrc: '.jshintrc'
-            },
-            all: [
-                'Gruntfile.js',
-                '<%= configPaths.app %>/{,*/}*.js'
-            ]
-        },
-
-        uglify: {
-            options: {
-                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - */'
-            },
-            dist: {
-                files: {
-                    '<%= configPaths.dist %>/modules/api-security.min.js':['<%= configPaths.app %>/modules/api-security.js'],
-                    '<%= configPaths.dist %>/directives/oauth-directives.min.js':['<%= configPaths.app %>/directives/oauth-directives.js'],
-                }
-            }
-        },
-
-        ngAnnotate: {
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '.tmp/concat/scripts',
-                    src: '*.js',
-                    dest: '.tmp/concat/scripts'
-                }]
-            }
-        },
-
         bump: {
             options: {
               files: ['package.json', 'bower.json'],
@@ -210,8 +177,89 @@ module.exports = function (grunt) {
                 configFile: '<%= configPaths.testsConfig %>/karma.unit.watch.conf.js',
                 autoWatch: true
             }
-        }
+        },
+
+        // concatenate source files
+        concat: {
+
+            // Concatenate all files for a module in a single module file
+            modules: {
+                files: files
+            },
+
+            // Concatenate all modules into a full distribution
+            dist: {
+                src: [
+                    '<%= configPaths.dist %>/*/*.js',
+                ],
+                dest: '<%= configPaths.dist %>/appverse-html5-security.js',
+            },
+        },
+
+        // ng-annotate tries to make the code safe for minification automatically
+        // by using the Angular long form for dependency injection.
+        ngAnnotate: {
+          dist: {
+            files: [{
+              expand: true,
+              cwd: '<%= configPaths.dist %>',
+              src: ['**/*.js', '!oldieshim.js'],
+              dest: '<%= configPaths.dist %>',
+              extDot : 'last'
+            }]
+          }
+        },
+
+        // Uglifies already concatenated files
+        uglify: {
+            options: {
+                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - */',
+                sourceMap: true,
+            },
+            dist: {
+                files: [{
+                      expand: true,     // Enable dynamic expansion.
+                      cwd: '<%= configPaths.dist %>',      // Src matches are relative to this path.
+                      src: ['**/*.js'], // Actual pattern(s) to match.
+                      dest: '<%= configPaths.dist %>',   // Destination path prefix.
+                      ext: '.min.js',   // Dest filepaths will have this extension.
+                      extDot: 'last'   // Extensions in filenames begin after the last dot
+                    }
+                ]
+            }
+        },
+
+        jshint: {
+            options: {
+                jshintrc: '.jshintrc',
+                reporter: require('jshint-stylish'),
+                //Show failures but do not stop the task
+                force: true
+            },
+            all: [
+                '<%= configPaths.src %>/{,*/}*.js'
+            ]
+        },
     });
+
+    // ------ Dist task. Builds the project -----
+
+    grunt.registerTask('default', [
+        'dist'
+    ]);
+
+    grunt.registerTask('dist', [
+        'jshint',
+        'unit',
+        'dist:make'
+    ]);
+
+    grunt.registerTask('dist:make', [
+        'clean:dist',
+        'concat',
+        'ngAnnotate',
+        'uglify'
+    ]);
 
     // ------ Demo tasks. Starts a webserver with a demo app -----
 
@@ -260,12 +308,6 @@ module.exports = function (grunt) {
         'docular'
     ]);
 
-    grunt.registerTask('dist', [
-        'clean:dist',
-        'ngAnnotate',
-        'uglify'
-    ]);
-
     grunt.registerTask('install', [
         'clean',
         'maven:install-src',
@@ -280,9 +322,6 @@ module.exports = function (grunt) {
         'maven:deploy-min'
     ]);
 
-    grunt.registerTask('default', [
-        'dist'
-    ]);
 };
 
 /*---------------------------------------- HELPER METHODS -------------------------------------*/
