@@ -131,6 +131,35 @@ module.exports = function (grunt) {
                     open : true
                 }
             },
+
+            // For e2e tests on demo app, with coverage reporting
+            e2e: {
+                options: {
+                    port: 9090,
+                     middleware: function (connect) {
+                        return [
+                            mountFolder(connect, configPaths.dist),
+                            mountFolder(connect, configPaths.bowerComponents),
+                            mountFolder(connect, configPaths.demo,{index: 'index-dist.html'}),
+                        ];
+                    }
+                }
+            },
+
+            demoDist: {
+                options: {
+                    port: 9091,
+                     middleware: function (connect) {
+                        return [
+                            mountFolder(connect, configPaths.dist),
+                            mountFolder(connect, configPaths.bowerComponents),
+                            mountFolder(connect, configPaths.demo,{index: 'index-dist.html'}),
+                        ];
+                    },
+                    open : true,
+                    keepalive : true
+                }
+            },
         },
 
         // Watch files changes and perform actions
@@ -229,6 +258,7 @@ module.exports = function (grunt) {
             }
         },
 
+        // Jshint code checks
         jshint: {
             options: {
                 jshintrc: '.jshintrc',
@@ -239,6 +269,23 @@ module.exports = function (grunt) {
             all: [
                 '<%= configPaths.src %>/{,*/}*.js'
             ]
+        },
+
+        // Execute commands that cannot be specified with tasks
+        exec: {
+            // These commands are defined in package.json for
+            // automatic resoultion of any binary included in node_modules/
+            protractor_start: 'npm run protractor',
+            webdriver_update: 'npm run update-webdriver'
+        },
+
+        // Starts protractor webdriver
+        protractor_webdriver: {
+            start: {
+                options: {
+                    command: 'node_modules/.bin/webdriver-manager start --standalone'
+                }
+            }
         },
     });
 
@@ -251,7 +298,8 @@ module.exports = function (grunt) {
     grunt.registerTask('dist', [
         'jshint',
         'unit',
-        'dist:make'
+        'dist:make',
+        'test:e2e'
     ]);
 
     grunt.registerTask('dist:make', [
@@ -267,6 +315,11 @@ module.exports = function (grunt) {
         'injector:demoScripts',
         'connect:livereload',
         'watch:demoLiveReload'
+    ]);
+
+    grunt.registerTask('demo:dist', [
+        'dist:make',
+        'connect:demoDist'
     ]);
 
     // ------ Dev tasks. To be run continously while developing -----
@@ -294,6 +347,11 @@ module.exports = function (grunt) {
         'test:unit:once'
     ]);
 
+    grunt.registerTask('e2e', [
+        'dist:make',
+        'test:e2e'
+    ]);
+
     grunt.registerTask('test:unit:watch', [
         'karma:unitAutoWatch'
     ]);
@@ -302,6 +360,14 @@ module.exports = function (grunt) {
         'karma:unit'
     ]);
 
+    grunt.registerTask('test:e2e',  [
+        'exec:webdriver_update',
+        'connect:e2e',
+        'protractor_webdriver',
+        'exec:protractor_start',
+    ]);
+
+    // ------ Other -----
 
     grunt.registerTask('doc', [
         'clean:docular',
