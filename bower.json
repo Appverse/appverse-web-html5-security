@@ -12,19 +12,18 @@
     "angular-scenario": "1.2.28"
   },
   "ignore": [
-    "**/.*",
-    "node_modules",
-    "docs",
     "bower_components",
+    "config",
+    "demo",
+    "doc",
+    "node_modules",
+    "reports",
+    "src",
     "test",
-    "Gruntfile.js",
-    "angus-site",
-    "docs-generation",
-    "appverse-html5-examples",
-    "karma.conf.js",
-    "karma-e2e.conf.js",
+    "**/.*",
+    "gruntfile.js"
     "package.json",
     "sonar-project.properties",
-    "changelog.js"
+    "changelog.js",
   ]
 }
