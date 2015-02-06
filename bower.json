@@ -4,12 +4,11 @@
   "version": "0.3.0",
   "main": "src/modules/api-security.js",
   "dependencies": {
-    "appverse-web-html5-core": "~0.2.1",
-    "appverse-web-html5-ui": "~0.2.1"
+    "appverse-web-html5-core": "~0.3.0"
   },
   "devDependencies": {
-    "angular-mocks": "1.2.28",
-    "angular-scenario": "1.2.28"
+    "angular-mocks": "~1.2.28",
+    "angular-scenario": "~1.2.28"
   },
   "ignore": [
     "bower_components",
@@ -25,5 +24,8 @@
     "package.json",
     "sonar-project.properties",
     "changelog.js"
-  ]
+  ],
+  "resolutions": {
+    "angular": "~1.2.28"
+  }
 }
