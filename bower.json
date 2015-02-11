@@ -1,29 +1,31 @@
 {
   "name": "appverse-web-html5-security",
   "description": "Appverse web html5 security module.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "src/modules/api-security.js",
   "dependencies": {
-    "appverse-web-html5-core": "0.2.0"
+    "appverse-web-html5-core": "~0.3.0"
   },
   "devDependencies": {
-    "angular-mocks": "1.0.8",
-    "angular-scenario": "1.0.8"
+    "angular-mocks": "~1.2.28",
+    "angular-scenario": "~1.2.28"
   },
   "ignore": [
-    "**/.*",
-    "node_modules",
-    "docs",
     "bower_components",
+    "config",
+    "demo",
+    "doc",
+    "node_modules",
+    "reports",
+    "src",
     "test",
-    "Gruntfile.js",
-    "angus-site",
-    "docs-generation",
-    "appverse-html5-examples",
-    "karma.conf.js",
-    "karma-e2e.conf.js",
+    "**/.*",
+    "gruntfile.js",
     "package.json",
     "sonar-project.properties",
     "changelog.js"
-  ]
+  ],
+  "resolutions": {
+    "angular": "~1.2.28"
+  }
 }
