@@ -4,7 +4,7 @@
     ////////////////////////////////////////////////////////////////////////////
     // COMMON API - 0.1
     // SECURITY
-    // PRIMARY MODULE (AppSecurity)
+    // PRIMARY MODULE (appverse.security)
     // CONFIG KEY: AD
     ////////////////////////////////////////////////////////////////////////////
     // 2 services
@@ -101,7 +101,7 @@
     //////////////////////////////////////////////////////////////////////////////
 
     /*@ngdoc module
-     * @name AppSecurity
+     * @name appverse.security
      * @description
      * 3 services:
      *
@@ -118,7 +118,7 @@
      *  It handles access to site sections
      *  Includes roles management and rights checking
      */
-    angular.module('AppSecurity', [
+    angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies
         'AppCache', // Common API Module: cache services
         'AppConfiguration', // Common API Module: configuration
@@ -185,7 +185,7 @@
 
 
     function run ($log) {
-        $log.info('AppSecurity run');
+        $log.info('appverse.security run');
     }
 
 })();

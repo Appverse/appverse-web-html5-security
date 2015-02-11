@@ -1,11 +1,11 @@
 (function() {
     'use strict';
 
-    angular.module('AppSecurity').factory('UserService', UserServiceFactory);
+    angular.module('appverse.security').factory('UserService', UserServiceFactory);
 
     /**
      * @ngdoc service
-     * @name AppSecurity.factory:UserService
+     * @name appverse.security.factory:UserService
      * @requires $log
      * @requires AppCache.factory:CacheFactory
      * @description
@@ -16,9 +16,9 @@
         return {
             /**
              * @ngdoc method name, roles, bToken, xsrfToken, isLogged
-             * @name AppSecurity.factory:UserService#setCurrentUser
-             * @methodOf AppSecurity.factory:UserService
-             * @param {AppSecurity.global:User} loggedUser The currently logged user
+             * @name appverse.security.factory:UserService#setCurrentUser
+             * @methodOf appverse.security.factory:UserService
+             * @param {appverse.security.global:User} loggedUser The currently logged user
              * @description Writes the current user in cache ('currentUser').
              */
             setCurrentUser: function (loggedUser) {
@@ -35,10 +35,10 @@
             },
             /**
              * @ngdoc method
-             * @name AppSecurity.factory:UserService#getCurrentUser
-             * @methodOf AppSecurity.factory:UserService
+             * @name appverse.security.factory:UserService#getCurrentUser
+             * @methodOf appverse.security.factory:UserService
              * @description Retrieves the current user from cache ('currentUser').
-             * @returns {AppSecurity.global:User} The currently logged user
+             * @returns {appverse.security.global:User} The currently logged user
              */
             getCurrentUser: function () {
                 var loggedUser = CacheFactory._browserCache.get('loggedUser');
@@ -49,9 +49,9 @@
             },
             /**
              * @ngdoc method
-             * @name AppSecurity.factory:UserService#removeUser
-             * @methodOf AppSecurity.factory:UserService
-             * @param {AppSecurity.global:User} loggedUser The currently logged user
+             * @name appverse.security.factory:UserService#removeUser
+             * @methodOf appverse.security.factory:UserService
+             * @param {appverse.security.global:User} loggedUser The currently logged user
              * @description Removes the current user from the app, including cache.
              */
             removeUser: function (loggedUser) {
@@ -62,7 +62,7 @@
 
 
     /* @doc function
-     * @name AppSecurity.global:User
+     * @name appverse.security.global:User
      * @param {string} name The name of the user to be registered
      * @param {object} roles Array with the list of assigned roles
      * @param {string} bToken The provided encrypted oauth token

@@ -1,12 +1,12 @@
 (function() {
     'use strict';
 
-    angular.module('AppSecurity').factory('AuthenticationService', AuthenticationServiceFactory);
+    angular.module('appverse.security').factory('AuthenticationService', AuthenticationServiceFactory);
 
     /**
      * @ngdoc service
-     * @name AppSecurity.factory:AuthenticationService
-     * @requires AppSecurity.factory:UserService
+     * @name appverse.security.factory:AuthenticationService
+     * @requires appverse.security.factory:UserService
      * @description
      * Exposes some useful methods for apps developers.
      */
@@ -71,8 +71,8 @@
 
             /**
              * @ngdoc method
-             * @name AppSecurity.factory:AuthenticationService#login
-             * @methodOf AppSecurity.factory:AuthenticationService
+             * @name appverse.security.factory:AuthenticationService#login
+             * @methodOf appverse.security.factory:AuthenticationService
              * @param {string} name Name of the user
              * @param {object} roles Set of roles of the user as array
              * @param {string} token The token from the oauth server
@@ -88,8 +88,8 @@
             },
             /**
              * @ngdoc method
-             * @name AppSecurity.factory:AuthenticationService#isLoggedIn
-             * @methodOf AppSecurity.factory:AuthenticationService
+             * @name appverse.security.factory:AuthenticationService#isLoggedIn
+             * @methodOf appverse.security.factory:AuthenticationService
              * @param {string} role The role to be validated
              * @description Check if the user is logged
              * @returns {boolean}  true if is already logged
@@ -103,9 +103,9 @@
             },
             /**
              * @ngdoc method
-             * @name AppSecurity.factory:AuthenticationService#logOut
-             * @methodOf AppSecurity.factory:AuthenticationService
-             * @param {AppSecurity.global:User} user The User object to be logged out
+             * @name appverse.security.factory:AuthenticationService#logOut
+             * @methodOf appverse.security.factory:AuthenticationService
+             * @param {appverse.security.global:User} user The User object to be logged out
              * @description Removes the current user from the app
              */
             logOut: function (user) {

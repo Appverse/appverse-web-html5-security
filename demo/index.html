@@ -31,19 +31,19 @@
 
     <!-- ########## Core modules: autoinjected. Check gruntfile.js ########## -->
     <!-- injector:js -->
-    <script src="api-security/module.js"></script>
-    <script src="api-security/authentication-service.factory.js"></script>
-    <script src="api-security/oauth-access-token.factory.js"></script>
-    <script src="api-security/oauth-endpoint.factory.js"></script>
-    <script src="api-security/oauth-profile.factory.js"></script>
-    <script src="api-security/oauth-request-wrapper.factory.js"></script>
-    <script src="api-security/oauth.directive.js"></script>
-    <script src="api-security/role-service.factory.js"></script>
-    <script src="api-security/user-service.factory.js"></script>
+    <script src="appverse-security/module.js"></script>
+    <script src="appverse-security/authentication-service.factory.js"></script>
+    <script src="appverse-security/oauth-access-token.factory.js"></script>
+    <script src="appverse-security/oauth-endpoint.factory.js"></script>
+    <script src="appverse-security/oauth-profile.factory.js"></script>
+    <script src="appverse-security/oauth-request-wrapper.factory.js"></script>
+    <script src="appverse-security/oauth.directive.js"></script>
+    <script src="appverse-security/role-service.factory.js"></script>
+    <script src="appverse-security/user-service.factory.js"></script>
     <!-- endinjector -->
 
     <script>
-        angular.module('security-demo-app', ['AppSecurity', 'COMMONAPI'])
+        angular.module('security-demo-app', ['appverse.security', 'COMMONAPI'])
             .run(function ($log) {
                 //
             });

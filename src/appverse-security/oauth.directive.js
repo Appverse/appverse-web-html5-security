@@ -1,16 +1,16 @@
 (function() {
   'use strict';
 
-  angular.module('AppSecurity')
+  angular.module('appverse.security')
 
   /**
    * @ngdoc directive
-   * @name AppSecurity.directive:oauth
+   * @name appverse.security.directive:oauth
    * @restrict B
    * @requires AppConfiguration.constant:SECURITY_OAUTH
-   * @requires AppSecurity.factory:Oauth_AccessToken
-   * @requires AppSecurity.factory:Oauth_Endpoint
-   * @requires AppSecurity.factory:Oauth_Profile
+   * @requires appverse.security.factory:Oauth_AccessToken
+   * @requires appverse.security.factory:Oauth_Endpoint
+   * @requires appverse.security.factory:Oauth_Profile
    * @requires $location
    * @requires $rootScope
    * @requires $compile
@@ -25,7 +25,7 @@
    * 
    * 
    * @example
-   <example module="AppSecurity">
+   <example module="appverse.security">
       <file name="index.html">
           <p>OAuth test</p>
           <oauth ng-cloak

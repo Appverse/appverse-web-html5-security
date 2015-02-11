@@ -1,12 +1,12 @@
 (function() {
     'use strict';
 
-    angular.module('AppSecurity').factory('Oauth_Profile', OauthProfileFactory);
+    angular.module('appverse.security').factory('Oauth_Profile', OauthProfileFactory);
 
     /**
      * @ngdoc service
-     * @name AppSecurity.factory:Oauth_Profile
-     * @requires AppSecurity.factory:Oauth_RequestWrapper
+     * @name appverse.security.factory:Oauth_Profile
+     * @requires appverse.security.factory:Oauth_RequestWrapper
      * @requires $resource
      * @requires SECURITY_OAUTH
      *

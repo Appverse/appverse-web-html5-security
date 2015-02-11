@@ -1,11 +1,11 @@
 (function() {
     'use strict';
 
-    angular.module('AppSecurity').factory('RoleService', RoleServiceFactory);
+    angular.module('appverse.security').factory('RoleService', RoleServiceFactory);
 
     /**
      * @ngdoc service
-     * @name AppSecurity.factory:RoleService
+     * @name appverse.security.factory:RoleService
      * @requires $log
      * @requires AppConfiguration.constant:AUTHORIZATION_DATA
      * @requires AppCache.factory:CacheFactory
@@ -17,8 +17,8 @@
         return {
             /**
              * @ngdoc method
-             * @name AppSecurity.factory:RoleService#validateRoleAdmin
-             * @methodOf AppSecurity.factory:RoleService
+             * @name appverse.security.factory:RoleService#validateRoleAdmin
+             * @methodOf appverse.security.factory:RoleService
              * @description Check if the passed user has a role in the adminsitrator family
              * @returns {boolean} True if the role of the usder has admin previleges
              */
@@ -43,8 +43,8 @@
             },
             /**
              * @ngdoc method
-             * @name AppSecurity.factory:RoleService#validateRoleInUserOther
-             * @methodOf AppSecurity.factory:RoleService
+             * @name appverse.security.factory:RoleService#validateRoleInUserOther
+             * @methodOf appverse.security.factory:RoleService
              * @param {string} role The role to be validated
              * @description Check if the passed user has a given role
              * @returns {boolean} True if the user has that role

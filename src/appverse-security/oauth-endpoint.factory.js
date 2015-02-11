@@ -1,12 +1,12 @@
 (function() {
     'use strict';
 
-    angular.module('AppSecurity').factory('Oauth_Endpoint', OauthEndpointFactory);
+    angular.module('appverse.security').factory('Oauth_Endpoint', OauthEndpointFactory);
 
     /**
      * @ngdoc service
-     * @name AppSecurity.factory:Oauth_Endpoint
-     * @requires AppSecurity.factory:Oauth_AccessToken
+     * @name appverse.security.factory:Oauth_Endpoint
+     * @requires appverse.security.factory:Oauth_AccessToken
      * @requires $location
      * @description
      * OAuth Endpoint service.
@@ -35,8 +35,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_Endpoint#set
-         * @methodOf AppSecurity.factory:Oauth_Endpoint
+         * @name appverse.security.factory:Oauth_Endpoint#set
+         * @methodOf appverse.security.factory:Oauth_Endpoint
          * @param {object} scope The current scope
          * @description Defines the authorization URL with correct attributes.
          * @returns {String} The URL for the oauth endpoint
@@ -55,8 +55,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_Endpoint#get
-         * @methodOf AppSecurity.factory:Oauth_Endpoint
+         * @name appverse.security.factory:Oauth_Endpoint#get
+         * @methodOf appverse.security.factory:Oauth_Endpoint
          * @description Returns the authorization URL.
          * @returns {String} The URL for the oauth endpoint
          */
@@ -66,8 +66,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_Endpoint#redirect
-         * @methodOf AppSecurity.factory:Oauth_Endpoint
+         * @name appverse.security.factory:Oauth_Endpoint#redirect
+         * @methodOf appverse.security.factory:Oauth_Endpoint
          * @description Redirects the app to the authorization URL.
          */
         factory.redirect = function () {
