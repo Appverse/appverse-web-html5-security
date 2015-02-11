@@ -88,8 +88,7 @@ module.exports = function (grunt) {
                 }]
             },
             coverage : '<%= configPaths.coverage %>/**',
-            server: '.tmp',
-            docular: 'doc'
+            server: '.tmp'
         },
 
         bump: {
@@ -368,11 +367,6 @@ module.exports = function (grunt) {
     ]);
 
     // ------ Other -----
-
-    grunt.registerTask('doc', [
-        'clean:docular',
-        'docular'
-    ]);
 
     grunt.registerTask('install', [
         'clean',
