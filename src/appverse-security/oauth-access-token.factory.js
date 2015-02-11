@@ -1,11 +1,11 @@
 (function() {
     'use strict';
 
-    angular.module('AppSecurity').factory('Oauth_AccessToken', OauthAccessTokenFactory);
+    angular.module('appverse.security').factory('Oauth_AccessToken', OauthAccessTokenFactory);
 
     /**
      * @ngdoc service
-     * @name AppSecurity.factory:Oauth_AccessToken
+     * @name appverse.security.factory:Oauth_AccessToken
      * @requires $location
      * @requires $cookies
      * @requires CacheFactory
@@ -22,8 +22,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#get
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#get
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Returns the access token.
          * @returns {object} The user token from the oauth server
          */
@@ -34,8 +34,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#getXSRF
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#getXSRF
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Returns the XSRF token to be input in each request header.
          * @returns {object} The xsrf token from the oauth server in the current session
          */
@@ -47,8 +47,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#set
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#set
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} scope The current scope
          * @description
          * Sets and returns the access token taking it from the fragment URI or eventually
@@ -72,8 +72,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#destroy
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#destroy
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} scope The current scope
          * @description Delete the access token and remove the cookies.
          * @returns {object} The user token from the oauth server
@@ -88,8 +88,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#expired
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#expired
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Tells when the access token is expired.
          * @returns {boolean} True or false if the token is expired
          */
@@ -102,8 +102,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#setTokenFromString
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#setTokenFromString
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} scope The current scope
          * @description
          * Get the access token from a string and save it
@@ -134,8 +134,8 @@
         }
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#getTokenFromString
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#getTokenFromString
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} hash The initial string
          * @description
          * Parse the fragment URI into an object
@@ -160,8 +160,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#setTokenFromCookies
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#setTokenFromCookies
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} scope The current scope
          * @description
          * Set the access token from the cookies.
@@ -179,8 +179,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#setTokenInCookies
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#setTokenInCookies
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} scope The current scope
          * @param {object} params with token value hash
          * @description
@@ -215,8 +215,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#setToken
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#setToken
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} params The object with the token
          * @param {object} scope The current scope
          * @description
@@ -237,8 +237,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#setExpiresAt
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#setExpiresAt
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description
          * Set the access token expiration date (useful for refresh logics)
          */
@@ -254,8 +254,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_AccessToken#removeFragment
-         * @methodOf AppSecurity.factory:Oauth_AccessToken
+         * @name appverse.security.factory:Oauth_AccessToken#removeFragment
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} scope The current scope
          * @description
          * Remove the fragment URI

@@ -22,8 +22,8 @@ configPaths = {
 // Define files to load in the demo, ordering and the way they are
 // concatenated for distribution
 files = {
-    '<%= configPaths.dist %>/api-security/api-security.js':
-    moduleFilesToConcat('<%= configPaths.src %>/api-security')
+    '<%= configPaths.dist %>/appverse-security/appverse-security.js':
+    moduleFilesToConcat('<%= configPaths.src %>/appverse-security')
 };
 
 module.exports = function (grunt) {

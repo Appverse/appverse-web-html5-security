@@ -1,13 +1,13 @@
 (function() {
     'use strict';
 
-    angular.module('AppSecurity').factory('Oauth_RequestWrapper', OauthRequestWrapperFactory);
+    angular.module('appverse.security').factory('Oauth_RequestWrapper', OauthRequestWrapperFactory);
 
     /**
      * @ngdoc service
-     * @name AppSecurity.factory:Oauth_RequestWrapper
-     * @requires AppSecurity.factory:Oauth_AccessToken
-     * @requires AppSecurity.factory:Oauth_Endpoint
+     * @name appverse.security.factory:Oauth_RequestWrapper
+     * @requires appverse.security.factory:Oauth_AccessToken
+     * @requires appverse.security.factory:Oauth_Endpoint
      * @requires $http
      *
      * @description
@@ -20,8 +20,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_RequestWrapper#wrapRequest
-         * @methodOf AppSecurity.factory:Oauth_RequestWrapper
+         * @name appverse.security.factory:Oauth_RequestWrapper#wrapRequest
+         * @methodOf appverse.security.factory:Oauth_RequestWrapper
          * @param {object} Restangular object
          * @param {object} actions Array with actions
          * @description Wraps every request with the Restangular object
@@ -48,8 +48,8 @@
 
         /**
          * @ngdoc method
-         * @name AppSecurity.factory:Oauth_RequestWrapper#setRequestHeaders
-         * @methodOf AppSecurity.factory:Oauth_RequestWrapper
+         * @name appverse.security.factory:Oauth_RequestWrapper#setRequestHeaders
+         * @methodOf appverse.security.factory:Oauth_RequestWrapper
          * @param {string} token The token value from the oauth server
          * @description
          * Set security request headers

@@ -9,9 +9,9 @@ var settings = {
     commonFiles : [
         'bower_components/angular/angular.js',
         'bower_components/angular-mocks/angular-mocks.js',
-        'src/api-*/**/module.js',
+        'src/appverse-*/**/module.js',
         // The rest
-        'src/api-*/**/*.js',
+        'src/appverse-*/**/*.js',
     ],
 
     unitFiles : [
