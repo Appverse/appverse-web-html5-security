@@ -32,11 +32,7 @@ Appverse Web Client Side security module based on HTML5 and Java Script
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-touch/angular-touch.min.js"></script>
-    <script src="bower_components/modernizr/modernizr.js"></script>
-    <script src="bower_components/jquery-flot/jquery.flot.js"></script>
-    <script src="bower_components/jquery-flot/jquery.flot.resize.js"></script>
-    <script src="bower_components/jquery-flot/jquery.flot.time.js"></script>
-
+    
     <!-- uibootstrap -->
     <script src="bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/transition.js"></script>
     <script src="bower_components/bootstrap-sass-official/vendor/assets/javascripts/bootstrap/collapse.js"></script>
@@ -48,13 +44,7 @@ Appverse Web Client Side security module based on HTML5 and Java Script
     <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="bower_components/angular-cache/dist/angular-cache.min.js"></script>
     <script src="bower_components/angular-resource/angular-resource.min.js"></script>
-    <script src="bower_components/ng-grid/build/ng-grid.debug.js"></script>
-
-    <!-- UI components -->
-    <script src="bower_components/venturocket-angular-slider/build/angular-slider.min.js"></script>
-    <script src="bower_components/qrcode/lib/qrcode.min.js"></script>
-    <script src="bower_components/angular-qr/angular-qr.min.js"></script>
-    <script src="bower_components/angular-xeditable/dist/js/xeditable.js"></script>
+    
   <!-- ########## API modules ########## -->
 
     <!-- Cache module -->
@@ -85,17 +75,12 @@ Appverse Web Client Side security module based on HTML5 and Java Script
 
     <script src="bower_components/appverse-web-html5-core/src/modules/api-utils.js"></script>
 
-    <!-- Directives should be included after the modules -->
-    <script src="bower_components/appverse-web-html5-core/src/directives/cache-directives.js"></script>
-    <script src="bower_components/appverse-web-html5-core/src/directives/rest-directives.js"></script>
-    <script src="bower_components/appverse-web-html5-core/src/modules/api-performance.js"></script>
-    
     <!-- your scripts here-->
     
     <!-- endbuild -->    
 ```
 
-* Add the `appverse-web-html5-core` module to your Angular module list (e.g. in a main app.js file: `angular.module('yourMainModule',['COMMONAPI'])`)
+* Add the `appverse-web-html5-security` module to your Angular module list (e.g. in a main app.js file: `angular.module('yourMainModule',['appverse','appverse.security'])`)
 
 
 ## License
