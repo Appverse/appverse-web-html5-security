@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('Oauth_AccessToken', OauthAccessTokenFactory);
@@ -8,12 +8,11 @@
      * @name appverse.security.factory:Oauth_AccessToken
      * @requires $location
      * @requires $cookies
-     * @requires CacheFactory
      * @description
      * OAuth access token service.
      * Management of the access token.
      */
-    function OauthAccessTokenFactory ($location, $cookies, CacheFactory, UserService) {
+    function OauthAccessTokenFactory($location, $cookies, UserService) {
 
         var factory = {};
         var token = null;
@@ -127,20 +126,20 @@
 
 
         function getXSRFTokenFromCache() {
-            var user = UserService.getCurrentUser();
-            if (user) {
-                xsrfToken = user.xsrfToken;
+                var user = UserService.getCurrentUser();
+                if (user) {
+                    xsrfToken = user.xsrfToken;
+                }
             }
-        }
-        /**
-         * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#getTokenFromString
-         * @methodOf appverse.security.factory:Oauth_AccessToken
-         * @param {object} hash The initial string
-         * @description
-         * Parse the fragment URI into an object
-         * @returns {object} The value of the token
-         */
+            /**
+             * @ngdoc method
+             * @name appverse.security.factory:Oauth_AccessToken#getTokenFromString
+             * @methodOf appverse.security.factory:Oauth_AccessToken
+             * @param {object} hash The initial string
+             * @description
+             * Parse the fragment URI into an object
+             * @returns {object} The value of the token
+             */
         function getTokenFromString(hash) {
             var splitted = hash.split('&');
             var params = {};
@@ -260,7 +259,7 @@
          * @description
          * Remove the fragment URI
          */
-        function removeFragment(scope) {
+        function removeFragment() {
             //TODO we need to let the fragment live if it's not the access token
             $location.hash('');
         }
