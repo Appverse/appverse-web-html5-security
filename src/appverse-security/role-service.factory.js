@@ -10,8 +10,8 @@
      * @description Manages user's roles.
      *
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
-     * @requires AppConfiguration.constant:AUTHORIZATION_DATA
-     * @requires AppCache.factory:CacheFactory
+     * @requires AUTHORIZATION_DATA
+     * @requires CacheFactory
      */
     function RoleServiceFactory ($log, AUTHORIZATION_DATA, CacheFactory) {
 
