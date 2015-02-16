@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     ////////////////////////////////////////////////////////////////////////////
@@ -100,8 +100,10 @@
     // CONFIGURATION: SECURITY_OAUTH
     //////////////////////////////////////////////////////////////////////////////
 
-    /*@ngdoc module
+    /**
+     * @ngdoc module
      * @name appverse.security
+     *
      * @description
      * 3 services:
      *
@@ -117,24 +119,38 @@
      * C-INTERNAL AUTHORIZATION
      *  It handles access to site sections
      *  Includes roles management and rights checking
+     *
+     * @requires https://docs.angularjs.org/api/ngCookies  ngCookies
+     * @requires AppCache
+     * @requires AppConfiguration
+     * @requires AppUtils
+     * @requires AppREST
      */
     angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies
-        'AppCache', // Common API Module: cache services
-        'AppConfiguration', // Common API Module: configuration
-        'AppUtils',
-        'AppREST'
+        'appverse.configuration', // Common API Module
+        'appverse.utils',
+        'ngResource'
     ])
-    .config(configModule)
-    .run(run);
+        .config(configModule)
+        .run(run);
 
+    function configModule($provide, $httpProvider, ModuleSeekerProvider) {
 
-    function configModule($provide, $httpProvider) {
+        if (!ModuleSeekerProvider.exists('appverse.cache')) {
 
-        function oauthResponseInterceptor ($q, $log, $injector) {
+            //appverse.cache module not found. Adding basic CacheFactory.
+            $provide.factory('CacheFactory', ["$cacheFactory", function ($cacheFactory) {
+                return {
+                    _browserCache: $cacheFactory('basicCache')
+                };
+            }]);
+        }
+
+        function oauthResponseInterceptor($q, $log, $injector) {
 
             return {
-                'response': function(response) {
+                'response': function (response) {
 
                     // Injected manually because of a circular dependency problem:
                     // $http -> interceptor -> Oauth_AccessToken -> CacheFactory -> $http
@@ -148,13 +164,13 @@
                     if (tokenInHeader) {
                         oauthAccessTokenService.setFromHeader(tokenInHeader);
                     }
-                     return response;
+                    return response;
                 }
 
             };
         }
 
-        oauthResponseInterceptor.$inject =  ['$q', '$log', '$injector'];
+        oauthResponseInterceptor.$inject = ['$q', '$log', '$injector'];
         $provide.factory('oauthResponseInterceptor', oauthResponseInterceptor);
         $httpProvider.interceptors.push('oauthResponseInterceptor');
 
@@ -182,15 +198,18 @@
 
         $httpProvider.responseInterceptors.push(logsOutUserOn401);
     }
-    configModule.$inject = ["$provide", "$httpProvider"];
+    configModule.$inject = ["$provide", "$httpProvider", "ModuleSeekerProvider"];
+
+    function run($log) {
+
+        $log.debug('appverse.security run');
 
 
-    function run ($log) {
-        $log.info('appverse.security run');
     }
     run.$inject = ["$log"];
 
 })();
+
 (function() {
     'use strict';
 
@@ -198,14 +217,30 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:AuthenticationService
-     * @requires appverse.security.factory:UserService
-     * @description
-     * Exposes some useful methods for apps developers.
+     * @name AuthenticationService
+     * @module  appverse.security
+     * @description Exposes some useful methods for apps developers.
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
+     * @requires UserService
+     * @requires Base64
+     * @requires https://docs.angularjs.org/api/ng/service/$http $http
+     * @requires https://docs.angularjs.org/api/ng/service/$q $q
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
+     * @requires SECURITY_GENERAL
      */
     function AuthenticationServiceFactory ($rootScope, UserService, Base64, $http, $q, $log, SECURITY_GENERAL) {
 
         return {
+
+            /**
+             * @ngdoc method
+             * @name  AuthenticationService#sendLoginRequest
+             * @description Send the login request based on Basic Authorization
+             *
+             * @param  {object} credentials An object containing two properties: name and password
+             * @return {object}             A promise resolving to the response
+             */
             sendLoginRequest: function (credentials) {
                 var deferred = $q.defer();
                 var encoded = Base64.encode(credentials.name + ':' + credentials.password);
@@ -235,7 +270,14 @@
                 return deferred.promise;
             },
 
-            sendLogoutRequest: function (credentials) {
+            /**
+             * @ngdoc method
+             * @name  AuthenticationService#sendLogoutRequest
+             * @description Send the login request based on Basic Authorization
+             *
+             * @return {object}             A promise resolving to the response
+             */
+            sendLogoutRequest: function () {
                 var deferred = $q.defer();
 
                 $http({
@@ -264,14 +306,15 @@
 
             /**
              * @ngdoc method
-             * @name appverse.security.factory:AuthenticationService#login
-             * @methodOf appverse.security.factory:AuthenticationService
+             * @name AuthenticationService#login
+             * @description Sets the new logged user
+             *
              * @param {string} name Name of the user
              * @param {object} roles Set of roles of the user as array
              * @param {string} token The token from the oauth server
              * @param {boolean} isLogged If the user is logged or not
              * @param {string} role The role to be validated
-             * @description Sets the new logged user
+
              */
             login: function (name, roles, bToken, xsrfToken, isLogged) {
                 //$log.debug(' -- bToken -- : ' + bToken);
@@ -281,10 +324,10 @@
             },
             /**
              * @ngdoc method
-             * @name appverse.security.factory:AuthenticationService#isLoggedIn
-             * @methodOf appverse.security.factory:AuthenticationService
+             * @name AuthenticationService#isLoggedIn
+             *  @description Check if the user is logged
+             *
              * @param {string} role The role to be validated
-             * @description Check if the user is logged
              * @returns {boolean}  true if is already logged
              */
             isLoggedIn: function () {
@@ -296,10 +339,10 @@
             },
             /**
              * @ngdoc method
-             * @name appverse.security.factory:AuthenticationService#logOut
-             * @methodOf appverse.security.factory:AuthenticationService
-             * @param {appverse.security.global:User} user The User object to be logged out
+             * @name AuthenticationService#logOut
              * @description Removes the current user from the app
+             *
+             * @param {User} user The User object to be logged out
              */
             logOut: function (user) {
                 UserService.removeUser(user);
@@ -310,22 +353,23 @@
     AuthenticationServiceFactory.$inject = ["$rootScope", "UserService", "Base64", "$http", "$q", "$log", "SECURITY_GENERAL"];
 
 })();
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('Oauth_AccessToken', OauthAccessTokenFactory);
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_AccessToken
-     * @requires $location
-     * @requires $cookies
-     * @requires CacheFactory
+     * @name Oauth_AccessToken
+     * @module  appverse.security
      * @description
      * OAuth access token service.
      * Management of the access token.
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$location $location
+     * @requires https://docs.angularjs.org/api/ng/service/$cookie $cookies
      */
-    function OauthAccessTokenFactory ($location, $cookies, CacheFactory, UserService) {
+    function OauthAccessTokenFactory($location, $cookies, UserService) {
 
         var factory = {};
         var token = null;
@@ -334,8 +378,7 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#get
-         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @name Oauth_AccessToken#get
          * @description Returns the access token.
          * @returns {object} The user token from the oauth server
          */
@@ -346,8 +389,7 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#getXSRF
-         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @name Oauth_AccessToken#getXSRF
          * @description Returns the XSRF token to be input in each request header.
          * @returns {object} The xsrf token from the oauth server in the current session
          */
@@ -359,13 +401,13 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#set
-         * @methodOf appverse.security.factory:Oauth_AccessToken
-         * @param {object} scope The current scope
+         * @name Oauth_AccessToken#set
          * @description
          * Sets and returns the access token taking it from the fragment URI or eventually
          * from the cookies. Use `AccessToken.init()` to load (at boot time) the access token.
          * @returns {object} The user token from the oauth server
+         *
+         * @param {object} scope The current scope
          */
         factory.set = function (scope) {
             // take the token from the query string and eventually save it in the cookies
@@ -384,10 +426,10 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#destroy
-         * @methodOf appverse.security.factory:Oauth_AccessToken
-         * @param {object} scope The current scope
+         * @name Oauth_AccessToken#destroy
          * @description Delete the access token and remove the cookies.
+         *
+         * @param {object} scope The current scope
          * @returns {object} The user token from the oauth server
          */
         factory.destroy = function (scope) {
@@ -400,9 +442,9 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#expired
-         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @name Oauth_AccessToken#expired
          * @description Tells when the access token is expired.
+         *
          * @returns {boolean} True or false if the token is expired
          */
         factory.expired = function () {
@@ -439,20 +481,20 @@
 
 
         function getXSRFTokenFromCache() {
-            var user = UserService.getCurrentUser();
-            if (user) {
-                xsrfToken = user.xsrfToken;
+                var user = UserService.getCurrentUser();
+                if (user) {
+                    xsrfToken = user.xsrfToken;
+                }
             }
-        }
-        /**
-         * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#getTokenFromString
-         * @methodOf appverse.security.factory:Oauth_AccessToken
-         * @param {object} hash The initial string
-         * @description
-         * Parse the fragment URI into an object
-         * @returns {object} The value of the token
-         */
+            /**
+             * @ngdoc method
+             * @name appverse.security.factory:Oauth_AccessToken#getTokenFromString
+             * @methodOf appverse.security.factory:Oauth_AccessToken
+             * @param {object} hash The initial string
+             * @description
+             * Parse the fragment URI into an object
+             * @returns {object} The value of the token
+             */
         function getTokenFromString(hash) {
             var splitted = hash.split('&');
             var params = {};
@@ -572,7 +614,7 @@
          * @description
          * Remove the fragment URI
          */
-        function removeFragment(scope) {
+        function removeFragment() {
             //TODO we need to let the fragment live if it's not the access token
             $location.hash('');
         }
@@ -580,9 +622,10 @@
 
         return factory;
     }
-    OauthAccessTokenFactory.$inject = ["$location", "$cookies", "CacheFactory", "UserService"];
+    OauthAccessTokenFactory.$inject = ["$location", "$cookies", "UserService"];
 
 })();
+
 (function() {
     'use strict';
 
@@ -590,12 +633,13 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_Endpoint
-     * @requires appverse.security.factory:Oauth_AccessToken
-     * @requires $location
+     * @name Oauth_Endpoint
+     * @module  appverse.security
      * @description
      * OAuth Endpoint service.
      * Contains one factory managing the authorization's (endpoint) URL.
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$location $location
      */
     function OauthEndpointFactory ($location) {
 
@@ -620,10 +664,10 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_Endpoint#set
-         * @methodOf appverse.security.factory:Oauth_Endpoint
-         * @param {object} scope The current scope
+         * @name Oauth_Endpoint#set
          * @description Defines the authorization URL with correct attributes.
+         *
+         * @param {object} scope The current scope
          * @returns {String} The URL for the oauth endpoint
          */
         factory.set = function (scope) {
@@ -640,9 +684,9 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_Endpoint#get
-         * @methodOf appverse.security.factory:Oauth_Endpoint
+         * @name Oauth_Endpoint#get
          * @description Returns the authorization URL.
+         *
          * @returns {String} The URL for the oauth endpoint
          */
         factory.get = function () {
@@ -651,8 +695,7 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_Endpoint#redirect
-         * @methodOf appverse.security.factory:Oauth_Endpoint
+         * @name Oauth_Endpoint#redirect
          * @description Redirects the app to the authorization URL.
          */
         factory.redirect = function () {
@@ -671,13 +714,13 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_Profile
-     * @requires appverse.security.factory:Oauth_RequestWrapper
-     * @requires $resource
-     * @requires SECURITY_OAUTH
+     * @name Oauth_Profile
+     * @module appverse.security
+     * @description Profile model
      *
-     * @description
-     * Profile model. *
+     * @requires appverse.security.factory:Oauth_RequestWrapper
+     * @requires https://docs.angularjs.org/api/ng/service/$resource $resource
+     * @requires SECURITY_OAUTH
      */
     function OauthProfileFactory(Oauth_RequestWrapper, $resource, SECURITY_OAUTH) {
         var resource = $resource(SECURITY_OAUTH.profile, {}, {
@@ -688,45 +731,48 @@
     OauthProfileFactory.$inject = ["Oauth_RequestWrapper", "$resource", "SECURITY_OAUTH"];
 
 })();
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('Oauth_RequestWrapper', OauthRequestWrapperFactory);
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_RequestWrapper
-     * @requires appverse.security.factory:Oauth_AccessToken
-     * @requires appverse.security.factory:Oauth_Endpoint
-     * @requires $http
-     *
+     * @name Oauth_RequestWrapper
+     * @module  appverse.security
      * @description
      * Requests wrapper. It wraps every request setting needed header by injecting
      * the access token into the header
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
+     * @requires Oauth_AccessToken
+     * @requires REST_CONFIG
+     * @requires SECURITY_GENERAL
      */
-    function OauthRequestWrapperFactory ($log, $browser, Oauth_AccessToken, REST_CONFIG, SECURITY_GENERAL) {
+    function OauthRequestWrapperFactory($log, $browser, Oauth_AccessToken, REST_CONFIG, SECURITY_GENERAL) {
+
         var factory = {};
-        //var token;
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_RequestWrapper#wrapRequest
-         * @methodOf appverse.security.factory:Oauth_RequestWrapper
+         * @name Oauth_RequestWrapper#wrapRequest
+         * @description Wraps every request with the Restangular object
+         *
          * @param {object} Restangular object
          * @param {object} actions Array with actions
-         * @description Wraps every request with the Restangular object
          * @returns {object} the modified Restangular object
          */
         factory.wrapRequest = function (restangular) {
+
             var token = Oauth_AccessToken.get();
             var wrappedRestangular = restangular;
 
             if (token) {
-                 $log.debug("OAuth token is present and valid. The wrapped request is secure.");
+                $log.debug("OAuth token is present and valid. The wrapped request is secure.");
                 setRequestHeaders(token, restangular);
             } else {
                 $log
-                .debug("OAuth token is not present yet. The wrapped request will not be secure.");
+                    .debug("OAuth token is not present yet. The wrapped request will not be secure.");
             }
 
             return wrappedRestangular;
@@ -736,14 +782,12 @@
 
         /////////////////////////////Private methods///////////////////////////////////
 
+
         /**
-         * @ngdoc method
-         * @name appverse.security.factory:Oauth_RequestWrapper#setRequestHeaders
-         * @methodOf appverse.security.factory:Oauth_RequestWrapper
-         * @param {string} token The token value from the oauth server
-         * @description
          * Set security request headers
          *
+         * @param {string} token The token value from the oauth server
+         * @param {object} wrappedRestangular The Restangular object
          */
         function setRequestHeaders(token, wrappedRestangular) {
             $log.debug('token: ' + token);
@@ -802,18 +846,19 @@
 
 
     /**
-     * @function
+     * Parse a request and location URL and determine whether this is a same-domain request.
+     *
      * @param {string} requestUrl The url of the request.
      * @param {string} locationUrl The current browser location url.
      * @returns {boolean} Whether the request is for the same domain.
-     * @description Parse a request and location URL and determine whether this is a same-domain request.
      */
     function isSameDomain(requestUrl, locationUrl) {
         var IS_SAME_DOMAIN_URL_MATCH = /^(([^:]+):)?\/\/(\w+:{0,1}\w*@)?([\w\.-]*)?(:([0-9]+))?(.*)$/;
         var match = IS_SAME_DOMAIN_URL_MATCH.exec(requestUrl);
         // if requestUrl is relative, the regex does not match.
-        if (match == null)
+        if (match === null) {
             return true;
+        }
 
         var domain1 = {
             protocol: match[2],
@@ -837,6 +882,7 @@
     }
 
 })();
+
 (function() {
   'use strict';
 
@@ -845,24 +891,23 @@
   /**
    * @ngdoc directive
    * @name appverse.security.directive:oauth
-   * @restrict B
-   * @requires AppConfiguration.constant:SECURITY_OAUTH
-   * @requires appverse.security.factory:Oauth_AccessToken
-   * @requires appverse.security.factory:Oauth_Endpoint
-   * @requires appverse.security.factory:Oauth_Profile
-   * @requires $location
-   * @requires $rootScope
-   * @requires $compile
-   * @requires $http
-   * @requires $templateCache
-   *
    * @description
    * Oauth Login Directive.
    * You can use the directive with or without data in the directive declaration.
    * If data are not included they will be loaded from configuration files.
    * Data in declaration overwrites data from configuration files.
-   * 
-   * 
+   *
+   * @restrict B
+   * @requires SECURITY_OAUTH
+   * @requires Oauth_AccessToken
+   * @requires Oauth_Endpoint
+   * @requires Oauth_Profile
+   * @requires https://docs.angularjs.org/api/ng/service/$location $location
+   * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
+   * @requires https://docs.angularjs.org/api/ng/service/$compile $compile
+   * @requires https://docs.angularjs.org/api/ng/service/$http $http
+   * @requires https://docs.angularjs.org/api/ng/service/$templateCache $templateCache
+   *
    * @example
    <example module="appverse.security">
       <file name="index.html">
@@ -912,39 +957,39 @@
         initProfile();             // get the profile info
         initView();                // set the actual visualization status for the widget
       });
-      
+
 
       /**
        * @function
        * @description set defaults into the scope object
        */
      function init () {
-        scope.site = scope.site || SECURITY_OAUTH.scopeURL;
-        scope.clientID = scope.clientID || SECURITY_OAUTH.clientID;
-        scope.redirect = scope.redirect || SECURITY_OAUTH.redirect;
-        scope.scope = scope.scope || SECURITY_OAUTH.scope;
-        scope.flow = scope.flow || SECURITY_OAUTH.flow;
-        scope.view = scope.view || SECURITY_OAUTH.view;
-        scope.storage = scope.storage || SECURITY_OAUTH.storage;
-        scope.scope = scope.scope || SECURITY_OAUTH.scope;
+        scope.site          = scope.site || SECURITY_OAUTH.scopeURL;
+        scope.clientID      = scope.clientID || SECURITY_OAUTH.clientID;
+        scope.redirect      = scope.redirect || SECURITY_OAUTH.redirect;
+        scope.scope         = scope.scope || SECURITY_OAUTH.scope;
+        scope.flow          = scope.flow || SECURITY_OAUTH.flow;
+        scope.view          = scope.view || SECURITY_OAUTH.view;
+        scope.storage       = scope.storage || SECURITY_OAUTH.storage;
+        scope.scope         = scope.scope || SECURITY_OAUTH.scope;
         scope.authorizePath = scope.authorizePath || SECURITY_OAUTH.scope_authorizePath;
-        scope.tokenPath = scope.tokenPath || SECURITY_OAUTH.scope_tokenPath;
-        scope.template = scope.template || SECURITY_OAUTH.scope_template;
+        scope.tokenPath     = scope.tokenPath || SECURITY_OAUTH.scope_tokenPath;
+        scope.template      = scope.template || SECURITY_OAUTH.scope_template;
       }
 
       /**
        * @function
-       * @description 
+       * @description
        * Gets the template and compile the desired layout.
-       * Based on $compile, it compiles a piece of HTML string or DOM into the retrieved 
-       * template and produces a template function, which can then be used to link scope and 
+       * Based on $compile, it compiles a piece of HTML string or DOM into the retrieved
+       * template and produces a template function, which can then be used to link scope and
        * the template together.
        */
       function compile () {
-        $http.get(scope.template, { 
-            //This allows you can get the template again by consuming the 
+        $http.get(scope.template, {
+            //This allows you can get the template again by consuming the
             //$templateCache service directly.
-            cache: $templateCache 
+            cache: $templateCache
         })
         .success(function(html) {
           element.html(html);
@@ -954,7 +999,7 @@
 
       /**
        * @function
-       * @description 
+       * @description
        * Gets the profile info.
        */
       function initProfile () {
@@ -965,23 +1010,23 @@
 
       /**
        * @function
-       * @description 
+       * @description
        * Sets the actual visualization status for the widget.
        */
       function initView (token) {
         var token = AccessToken.get();
         // There is not token: without access token it's logged out
-        if (!token)             { 
-            return loggedOut() 
-        }   
+        if (!token)             {
+            return loggedOut()
+        }
         // The request exists: if there is the access token we are done
-        if (token.access_token) { 
-            return loggedIn() 
-        }    
+        if (token.access_token) {
+            return loggedIn()
+        }
         // The request is denied: if the request has been denied we fire the denied event
-        if (token.error)        { 
-            return denied() 
-        }      
+        if (token.error)        {
+            return denied()
+        }
       }
 
       scope.login = function() {
@@ -992,28 +1037,28 @@
         AccessToken.destroy(scope);
         loggedOut();
       }
-      
+
       /**
        * @function
-       * @description 
+       * @description
        */
       function loggedIn(){
         $rootScope.$broadcast('oauth:success', AccessToken.get());
         scope.show = 'logout';
       }
-      
+
       /**
        * @function
-       * @description 
+       * @description
        */
       function loggedOut () {
         $rootScope.$broadcast('oauth:logout');
         scope.show = 'login';
       }
-      
+
       /**
        * @function
-       * @description 
+       * @description
        */
       function denied(){
         scope.show = 'denied';
@@ -1031,28 +1076,30 @@
 
 
 })();
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('RoleService', RoleServiceFactory);
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:RoleService
-     * @requires $log
-     * @requires AppConfiguration.constant:AUTHORIZATION_DATA
-     * @requires AppCache.factory:CacheFactory
-     * @description
-     * Manages user's roles.
+     * @name RoleService
+     * @module  appverse.security
+     * @description Manages user's roles.
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
+     * @requires AUTHORIZATION_DATA
+     * @requires CacheFactory
      */
-    function RoleServiceFactory ($log, AUTHORIZATION_DATA, CacheFactory) {
+    function RoleServiceFactory($log, AUTHORIZATION_DATA, CacheFactory) {
 
         return {
+
             /**
              * @ngdoc method
-             * @name appverse.security.factory:RoleService#validateRoleAdmin
-             * @methodOf appverse.security.factory:RoleService
+             * @name RoleService#validateRoleAdmin
              * @description Check if the passed user has a role in the adminsitrator family
+             *
              * @returns {boolean} True if the role of the usder has admin previleges
              */
             validateRoleAdmin: function () {
@@ -1074,17 +1121,18 @@
                     return false;
                 }
             },
+
             /**
              * @ngdoc method
              * @name appverse.security.factory:RoleService#validateRoleInUserOther
-             * @methodOf appverse.security.factory:RoleService
-             * @param {string} role The role to be validated
              * @description Check if the passed user has a given role
+             *
+             * @param {string} role The role to be validated
              * @returns {boolean} True if the user has that role
              */
             validateRoleInUserOther: function (role) {
-                if (CacheFactory._browserCache.currentUser) {
-                    var user = CacheFactory._browserCache.currentUser;
+                var user = CacheFactory._browserCache.get('loggedUser');
+                if (user) {
                     return _.contains(role, user.roles);
                 } else {
                     return false;
@@ -1096,28 +1144,32 @@
     RoleServiceFactory.$inject = ["$log", "AUTHORIZATION_DATA", "CacheFactory"];
 
 })();
-(function() {
+
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('UserService', UserServiceFactory);
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:UserService
-     * @requires $log
-     * @requires AppCache.factory:CacheFactory
+     * @name UserService
+     * @module appverse.security
+     *
      * @description
      * Handles the user in the app.
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
+     * @requires CacheFactory
      */
-    function UserServiceFactory ($log, CacheFactory) {
+    function UserServiceFactory($log, CacheFactory) {
 
         return {
             /**
-             * @ngdoc method name, roles, bToken, xsrfToken, isLogged
-             * @name appverse.security.factory:UserService#setCurrentUser
-             * @methodOf appverse.security.factory:UserService
-             * @param {appverse.security.global:User} loggedUser The currently logged user
-             * @description Writes the current user in cache ('currentUser').
+             * @ngdoc method
+             * @name UserService#setCurrentUser
+             * @description Writes the current user in cache ('loggedUser').
+             *
+             * @param {object} loggedUser The currently logged user
              */
             setCurrentUser: function (loggedUser) {
 
@@ -1133,9 +1185,8 @@
             },
             /**
              * @ngdoc method
-             * @name appverse.security.factory:UserService#getCurrentUser
-             * @methodOf appverse.security.factory:UserService
-             * @description Retrieves the current user from cache ('currentUser').
+             * @name UserService#getCurrentUser
+             * @description Retrieves the current user from cache ('loggedUser').
              * @returns {appverse.security.global:User} The currently logged user
              */
             getCurrentUser: function () {
@@ -1147,12 +1198,10 @@
             },
             /**
              * @ngdoc method
-             * @name appverse.security.factory:UserService#removeUser
-             * @methodOf appverse.security.factory:UserService
-             * @param {appverse.security.global:User} loggedUser The currently logged user
+             * @name UserService#removeUser
              * @description Removes the current user from the app, including cache.
              */
-            removeUser: function (loggedUser) {
+            removeUser: function () {
                 CacheFactory._browserCache.remove('loggedUser');
             }
         };
@@ -1160,14 +1209,17 @@
     UserServiceFactory.$inject = ["$log", "CacheFactory"];
 
 
-    /* @doc function
-     * @name appverse.security.global:User
+    /**
+     * @ngdoc object
+     * @name User
+     * @module appverse.security
+     * @description Entity with main data about a user to be handled by the module
+     *
      * @param {string} name The name of the user to be registered
      * @param {object} roles Array with the list of assigned roles
      * @param {string} bToken The provided encrypted oauth token
      * @param {int} xsrfToken The XSRF token provided by the server
      * @param {boolean} isLogged The user is logged or not
-     * @description Entity with main data about a user to be handled by the module
      */
     function User(name, roles, bToken, xsrfToken, isLogged) {
         this.name = name;
