@@ -5,14 +5,16 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_RequestWrapper
-     * @requires appverse.security.factory:Oauth_AccessToken
-     * @requires appverse.security.factory:Oauth_Endpoint
-     * @requires $http
-     *
+     * @name Oauth_RequestWrapper
+     * @module  appverse.security
      * @description
      * Requests wrapper. It wraps every request setting needed header by injecting
      * the access token into the header
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
+     * @requires Oauth_AccessToken
+     * @requires REST_CONFIG
+     * @requires SECURITY_GENERAL
      */
     function OauthRequestWrapperFactory($log, $browser, Oauth_AccessToken, REST_CONFIG, SECURITY_GENERAL) {
 
@@ -20,11 +22,11 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_RequestWrapper#wrapRequest
-         * @methodOf appverse.security.factory:Oauth_RequestWrapper
+         * @name Oauth_RequestWrapper#wrapRequest
+         * @description Wraps every request with the Restangular object
+         *
          * @param {object} Restangular object
          * @param {object} actions Array with actions
-         * @description Wraps every request with the Restangular object
          * @returns {object} the modified Restangular object
          */
         factory.wrapRequest = function (restangular) {
@@ -47,14 +49,12 @@
 
         /////////////////////////////Private methods///////////////////////////////////
 
+
         /**
-         * @ngdoc method
-         * @name appverse.security.factory:Oauth_RequestWrapper#setRequestHeaders
-         * @methodOf appverse.security.factory:Oauth_RequestWrapper
-         * @param {string} token The token value from the oauth server
-         * @description
          * Set security request headers
          *
+         * @param {string} token The token value from the oauth server
+         * @param {object} wrappedRestangular The Restangular object
          */
         function setRequestHeaders(token, wrappedRestangular) {
             $log.debug('token: ' + token);
@@ -112,11 +112,11 @@
 
 
     /**
-     * @function
+     * Parse a request and location URL and determine whether this is a same-domain request.
+     *
      * @param {string} requestUrl The url of the request.
      * @param {string} locationUrl The current browser location url.
      * @returns {boolean} Whether the request is for the same domain.
-     * @description Parse a request and location URL and determine whether this is a same-domain request.
      */
     function isSameDomain(requestUrl, locationUrl) {
         var IS_SAME_DOMAIN_URL_MATCH = /^(([^:]+):)?\/\/(\w+:{0,1}\w*@)?([\w\.-]*)?(:([0-9]+))?(.*)$/;

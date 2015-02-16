@@ -100,8 +100,10 @@
     // CONFIGURATION: SECURITY_OAUTH
     //////////////////////////////////////////////////////////////////////////////
 
-    /*@ngdoc module
+    /**
+     * @ngdoc module
      * @name appverse.security
+     *
      * @description
      * 3 services:
      *
@@ -117,6 +119,12 @@
      * C-INTERNAL AUTHORIZATION
      *  It handles access to site sections
      *  Includes roles management and rights checking
+     *
+     * @requires https://docs.angularjs.org/api/ngCookies  ngCookies
+     * @requires AppCache
+     * @requires AppConfiguration
+     * @requires AppUtils
+     * @requires AppREST
      */
     angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies

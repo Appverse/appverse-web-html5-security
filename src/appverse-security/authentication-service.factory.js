@@ -5,14 +5,30 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:AuthenticationService
-     * @requires appverse.security.factory:UserService
-     * @description
-     * Exposes some useful methods for apps developers.
+     * @name AuthenticationService
+     * @module  appverse.security
+     * @description Exposes some useful methods for apps developers.
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
+     * @requires UserService
+     * @requires Base64
+     * @requires https://docs.angularjs.org/api/ng/service/$http $http
+     * @requires https://docs.angularjs.org/api/ng/service/$q $q
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
+     * @requires SECURITY_GENERAL
      */
     function AuthenticationServiceFactory ($rootScope, UserService, Base64, $http, $q, $log, SECURITY_GENERAL) {
 
         return {
+
+            /**
+             * @ngdoc method
+             * @name  AuthenticationService#sendLoginRequest
+             * @description Send the login request based on Basic Authorization
+             *
+             * @param  {object} credentials An object containing two properties: name and password
+             * @return {object}             A promise resolving to the response
+             */
             sendLoginRequest: function (credentials) {
                 var deferred = $q.defer();
                 var encoded = Base64.encode(credentials.name + ':' + credentials.password);
@@ -42,7 +58,14 @@
                 return deferred.promise;
             },
 
-            sendLogoutRequest: function (credentials) {
+            /**
+             * @ngdoc method
+             * @name  AuthenticationService#sendLogoutRequest
+             * @description Send the login request based on Basic Authorization
+             *
+             * @return {object}             A promise resolving to the response
+             */
+            sendLogoutRequest: function () {
                 var deferred = $q.defer();
 
                 $http({
@@ -71,14 +94,15 @@
 
             /**
              * @ngdoc method
-             * @name appverse.security.factory:AuthenticationService#login
-             * @methodOf appverse.security.factory:AuthenticationService
+             * @name AuthenticationService#login
+             * @description Sets the new logged user
+             *
              * @param {string} name Name of the user
              * @param {object} roles Set of roles of the user as array
              * @param {string} token The token from the oauth server
              * @param {boolean} isLogged If the user is logged or not
              * @param {string} role The role to be validated
-             * @description Sets the new logged user
+
              */
             login: function (name, roles, bToken, xsrfToken, isLogged) {
                 //$log.debug(' -- bToken -- : ' + bToken);
@@ -88,10 +112,10 @@
             },
             /**
              * @ngdoc method
-             * @name appverse.security.factory:AuthenticationService#isLoggedIn
-             * @methodOf appverse.security.factory:AuthenticationService
+             * @name AuthenticationService#isLoggedIn
+             *  @description Check if the user is logged
+             *
              * @param {string} role The role to be validated
-             * @description Check if the user is logged
              * @returns {boolean}  true if is already logged
              */
             isLoggedIn: function () {
@@ -103,10 +127,10 @@
             },
             /**
              * @ngdoc method
-             * @name appverse.security.factory:AuthenticationService#logOut
-             * @methodOf appverse.security.factory:AuthenticationService
-             * @param {appverse.security.global:User} user The User object to be logged out
+             * @name AuthenticationService#logOut
              * @description Removes the current user from the app
+             *
+             * @param {User} user The User object to be logged out
              */
             logOut: function (user) {
                 UserService.removeUser(user);
