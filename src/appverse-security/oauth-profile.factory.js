@@ -5,13 +5,15 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_Profile
+     * @name Oauth_Profile
+     * @description
+     * Profile model.
+     *
      * @requires appverse.security.factory:Oauth_RequestWrapper
      * @requires $resource
      * @requires SECURITY_OAUTH
      *
-     * @description
-     * Profile model. *
+
      */
     function OauthProfileFactory(Oauth_RequestWrapper, $resource, SECURITY_OAUTH) {
         var resource = $resource(SECURITY_OAUTH.profile, {}, {

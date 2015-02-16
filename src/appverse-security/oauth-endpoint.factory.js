@@ -5,12 +5,15 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_Endpoint
-     * @requires appverse.security.factory:Oauth_AccessToken
-     * @requires $location
+     * @name Oauth_Endpoint
+     * @module  appverse.security
      * @description
      * OAuth Endpoint service.
      * Contains one factory managing the authorization's (endpoint) URL.
+     *
+     * @requires Oauth_AccessToken
+     * @requires $location
+
      */
     function OauthEndpointFactory ($location) {
 
@@ -35,10 +38,10 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_Endpoint#set
-         * @methodOf appverse.security.factory:Oauth_Endpoint
-         * @param {object} scope The current scope
+         * @name Oauth_Endpoint#set
          * @description Defines the authorization URL with correct attributes.
+         *
+         * @param {object} scope The current scope
          * @returns {String} The URL for the oauth endpoint
          */
         factory.set = function (scope) {
@@ -55,9 +58,9 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_Endpoint#get
-         * @methodOf appverse.security.factory:Oauth_Endpoint
+         * @name Oauth_Endpoint#get
          * @description Returns the authorization URL.
+         *
          * @returns {String} The URL for the oauth endpoint
          */
         factory.get = function () {
@@ -66,8 +69,7 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_Endpoint#redirect
-         * @methodOf appverse.security.factory:Oauth_Endpoint
+         * @name Oauth_Endpoint#redirect
          * @description Redirects the app to the authorization URL.
          */
         factory.redirect = function () {

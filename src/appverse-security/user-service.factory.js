@@ -54,7 +54,7 @@
              * @name UserService#removeUser
              * @description Removes the current user from the app, including cache.
              *
-             * @param {appverse.security.global:User} loggedUser The currently logged user
+             * @param {User} loggedUser The currently logged user
              */
             removeUser: function (loggedUser) {
                 CacheFactory._browserCache.remove('loggedUser');
@@ -63,15 +63,17 @@
     }
 
 
-    /* @doc function
+    /**
+     * @ngdoc object
      * @name User
      * @module appverse.security
+     * @description Entity with main data about a user to be handled by the module
+     *
      * @param {string} name The name of the user to be registered
      * @param {object} roles Array with the list of assigned roles
      * @param {string} bToken The provided encrypted oauth token
      * @param {int} xsrfToken The XSRF token provided by the server
      * @param {boolean} isLogged The user is logged or not
-     * @description Entity with main data about a user to be handled by the module
      */
     function User(name, roles, bToken, xsrfToken, isLogged) {
         this.name = name;

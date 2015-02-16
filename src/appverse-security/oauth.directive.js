@@ -6,6 +6,12 @@
   /**
    * @ngdoc directive
    * @name appverse.security.directive:oauth
+   * @description
+   * Oauth Login Directive.
+   * You can use the directive with or without data in the directive declaration.
+   * If data are not included they will be loaded from configuration files.
+   * Data in declaration overwrites data from configuration files.
+   *
    * @restrict B
    * @requires AppConfiguration.constant:SECURITY_OAUTH
    * @requires appverse.security.factory:Oauth_AccessToken
@@ -17,13 +23,6 @@
    * @requires $http
    * @requires $templateCache
    *
-   * @description
-   * Oauth Login Directive.
-   * You can use the directive with or without data in the directive declaration.
-   * If data are not included they will be loaded from configuration files.
-   * Data in declaration overwrites data from configuration files.
-   * 
-   * 
    * @example
    <example module="appverse.security">
       <file name="index.html">
@@ -73,7 +72,7 @@
         initProfile();             // get the profile info
         initView();                // set the actual visualization status for the widget
       });
-      
+
 
       /**
        * @function
@@ -95,17 +94,17 @@
 
       /**
        * @function
-       * @description 
+       * @description
        * Gets the template and compile the desired layout.
-       * Based on $compile, it compiles a piece of HTML string or DOM into the retrieved 
-       * template and produces a template function, which can then be used to link scope and 
+       * Based on $compile, it compiles a piece of HTML string or DOM into the retrieved
+       * template and produces a template function, which can then be used to link scope and
        * the template together.
        */
       function compile () {
-        $http.get(scope.template, { 
-            //This allows you can get the template again by consuming the 
+        $http.get(scope.template, {
+            //This allows you can get the template again by consuming the
             //$templateCache service directly.
-            cache: $templateCache 
+            cache: $templateCache
         })
         .success(function(html) {
           element.html(html);
@@ -115,7 +114,7 @@
 
       /**
        * @function
-       * @description 
+       * @description
        * Gets the profile info.
        */
       function initProfile () {
@@ -126,23 +125,23 @@
 
       /**
        * @function
-       * @description 
+       * @description
        * Sets the actual visualization status for the widget.
        */
       function initView (token) {
         var token = AccessToken.get();
         // There is not token: without access token it's logged out
-        if (!token)             { 
-            return loggedOut() 
-        }   
+        if (!token)             {
+            return loggedOut()
+        }
         // The request exists: if there is the access token we are done
-        if (token.access_token) { 
-            return loggedIn() 
-        }    
+        if (token.access_token) {
+            return loggedIn()
+        }
         // The request is denied: if the request has been denied we fire the denied event
-        if (token.error)        { 
-            return denied() 
-        }      
+        if (token.error)        {
+            return denied()
+        }
       }
 
       scope.login = function() {
@@ -153,28 +152,28 @@
         AccessToken.destroy(scope);
         loggedOut();
       }
-      
+
       /**
        * @function
-       * @description 
+       * @description
        */
       function loggedIn(){
         $rootScope.$broadcast('oauth:success', AccessToken.get());
         scope.show = 'logout';
       }
-      
+
       /**
        * @function
-       * @description 
+       * @description
        */
       function loggedOut () {
         $rootScope.$broadcast('oauth:logout');
         scope.show = 'login';
       }
-      
+
       /**
        * @function
-       * @description 
+       * @description
        */
       function denied(){
         scope.show = 'denied';

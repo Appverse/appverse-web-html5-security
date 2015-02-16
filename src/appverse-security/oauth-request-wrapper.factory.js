@@ -5,14 +5,15 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_RequestWrapper
-     * @requires appverse.security.factory:Oauth_AccessToken
-     * @requires appverse.security.factory:Oauth_Endpoint
-     * @requires $http
-     *
+     * @name Oauth_RequestWrapper
+     * @module  appverse.security
      * @description
      * Requests wrapper. It wraps every request setting needed header by injecting
      * the access token into the header
+     *
+     * @requires Oauth_AccessToken
+     * @requires Oauth_Endpoint
+     * @requires $http
      */
     function OauthRequestWrapperFactory ($log, $browser, Oauth_AccessToken, REST_CONFIG, SECURITY_GENERAL) {
         var factory = {};
@@ -20,11 +21,11 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_RequestWrapper#wrapRequest
-         * @methodOf appverse.security.factory:Oauth_RequestWrapper
+         * @name Oauth_RequestWrapper#wrapRequest
+         * @description Wraps every request with the Restangular object
+         *
          * @param {object} Restangular object
          * @param {object} actions Array with actions
-         * @description Wraps every request with the Restangular object
          * @returns {object} the modified Restangular object
          */
         factory.wrapRequest = function (restangular) {
@@ -46,14 +47,11 @@
 
         /////////////////////////////Private methods///////////////////////////////////
 
+
         /**
-         * @ngdoc method
-         * @name appverse.security.factory:Oauth_RequestWrapper#setRequestHeaders
-         * @methodOf appverse.security.factory:Oauth_RequestWrapper
-         * @param {string} token The token value from the oauth server
-         * @description
          * Set security request headers
-         *
+         * @param {string} token The token value from the oauth server
+         * @param {object} wrappedRestangular The Restangular object
          */
         function setRequestHeaders(token, wrappedRestangular) {
             $log.debug('token: ' + token);
