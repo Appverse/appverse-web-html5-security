@@ -4,7 +4,7 @@
   "version": "0.4.0",
   "main": "src/modules/api-security.js",
   "dependencies": {
-    "appverse-web-html5-core": "~0.3.0"
+    "appverse-web-html5-core": "develop"
   },
   "devDependencies": {
     "angular-mocks": "~1.2.28",
