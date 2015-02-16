@@ -1,0 +1,67 @@
+{% extends "base.template.html" %}
+
+{% block content %}
+<h1>
+  {% if doc.title %}{$ doc.title | marked $}{% else %}{$ '<strong>' + doc.name + '</strong>' + ' module' $}{% endif %}
+</h1>
+
+{$ doc.description | marked $}
+
+{% if doc.name != 'ng' and doc.name != 'auto' %}
+  <h2>Installation</h2>
+
+  <p>First include {$ doc.moduleFile | code $} in your HTML:</p>
+
+  {% code %}
+      <script src="angular.js">
+      {% if doc.name != 'appverse' %}<script src="appverse.js">{% endif %}
+      <script src="{$ doc.moduleFile $}">
+  {% endcode %}
+
+  <p>This module is included in the {$ doc.packageName $} <a href="http://bower.io">Bower</a> package. You can install it with:</p>
+     {% code %}bower install {$ doc.packageName $}@X.Y.Z --save{% endcode %}
+
+  <p>Then load the module in your application by adding it as a dependent module:</p>
+  {% code %}
+    angular.module('app', ['{$ doc.name $}']);
+  {% endcode %}
+
+  <p>With that you&apos;re ready to get started!</p>
+{% endif %}
+
+<div class="component-breakdown">
+  <h2>Module Components</h2>
+  {% for componentGroup in doc.componentGroups %}
+  <div>
+    <h3 class="component-heading" id="{$ componentGroup.groupType | dashCase $}">{$ componentGroup.groupType | title $}</h3>
+    <table class="definition-table">
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      {% for component in componentGroup.components %}
+      <tr>
+        <td>{$ component.id | link(component.name, component) $}</td>
+        <td>{$ component.description | firstParagraph | marked $}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endfor %}
+</div>
+
+{% if doc.usage %}
+  <h2>Usage</h2>
+  {$ doc.usage | marked $}
+{% endif %}
+
+
+{%- if doc.requires %}
+<h2 id="dependencies">Dependencies</h2>
+<ul>
+  {% for require in doc.requires %}<li>{$ require | link $}</li>{% endfor %}
+</ul>
+{% endif -%}
+
+
+{% endblock %}

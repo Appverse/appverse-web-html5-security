@@ -5,21 +5,23 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:RoleService
-     * @requires $log
-     * @requires AppConfiguration.constant:AUTHORIZATION_DATA
-     * @requires AppCache.factory:CacheFactory
-     * @description
-     * Manages user's roles.
+     * @name RoleService
+     * @module  appverse.security
+     * @description Manages user's roles.
+     *
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
+     * @requires AUTHORIZATION_DATA
+     * @requires CacheFactory
      */
     function RoleServiceFactory ($log, AUTHORIZATION_DATA, CacheFactory) {
 
         return {
+
             /**
              * @ngdoc method
-             * @name appverse.security.factory:RoleService#validateRoleAdmin
-             * @methodOf appverse.security.factory:RoleService
+             * @name RoleService#validateRoleAdmin
              * @description Check if the passed user has a role in the adminsitrator family
+             *
              * @returns {boolean} True if the role of the usder has admin previleges
              */
             validateRoleAdmin: function () {
@@ -41,12 +43,13 @@
                     return false;
                 }
             },
+
             /**
              * @ngdoc method
              * @name appverse.security.factory:RoleService#validateRoleInUserOther
-             * @methodOf appverse.security.factory:RoleService
-             * @param {string} role The role to be validated
              * @description Check if the passed user has a given role
+             *
+             * @param {string} role The role to be validated
              * @returns {boolean} True if the user has that role
              */
             validateRoleInUserOther: function (role) {

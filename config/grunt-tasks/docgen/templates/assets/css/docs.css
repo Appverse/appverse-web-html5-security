@@ -1,0 +1,132 @@
+body {
+    font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+p {
+    font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
+    color: rgb(90, 90, 90);
+    line-height: 26.6000003814697px;
+}
+
+/* Navbar colors */
+.horizontal-gradient {
+    background: #296ad4;
+    background: -moz-linear-gradient(left, #296ad4 0%, #4e8ef7 100%);
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%, #296ad4), color-stop(100%, #4e8ef7));
+    background: -webkit-linear-gradient(left, #296ad4 0%, #4e8ef7 100%);
+    background: -o-linear-gradient(left, #296ad4 0%, #4e8ef7 100%);
+    background: -ms-linear-gradient(left, #296ad4 0%, #4e8ef7 100%);
+    background: linear-gradient(to right, #296ad4 0%, #4e8ef7 100%);
+}
+.navbar-default .navbar-nav>li>a {
+    color: rgb(235, 243, 255);
+}
+.navbar-default .navbar-nav>li>a:hover {
+    color: #0D3054;
+}
+
+/* Navbar height */
+@media (min-width: 750px) {
+  .navbar-default .navbar-nav>li>a {
+    line-height: 70px;
+   }
+   .navbar-header a {
+    line-height: 70px;
+   }
+}
+
+/* Navbar subsections */
+.list-section {
+    background-color: #FAFAFA;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+.list-section > div {
+    background-color: #FAFAFA;
+    padding: 8px;
+}
+
+.list-section > .section-title {
+    background-color: #F0F0F0;
+}
+
+.list-section > .section-title {
+    background-color: #F0F0F0;
+}
+
+.list-section > .section-title > a {
+    color: #777777;
+}
+
+.list-section > .section-title > a:hover {
+    color: #444444;
+}
+
+/* Fonts */
+.bigger-size {
+    font-size: 1.1em;
+}
+
+/* Links */
+.gray-links a {
+    color: #BEBEBE;
+}
+.gray-links a:hover {
+    color: #6E6E6E;
+}
+.no-underline-links a {
+    color: #BEBEBE;
+}
+.no-underline-links a:hover {
+    text-decoration: none;
+}
+
+/* Lists */
+.no-list-style {
+    list-style: none;
+    padding-left: 20px;
+}
+.higher-lis li {
+    margin: 10px 0 0 0;
+}
+.list-less-left-padding {
+    padding-left: 10px;
+}
+
+
+/* Tables */
+
+.definition-table td, th {
+    padding: 10px;
+}
+
+
+
+/* Code */
+pre {
+    display: block;
+    padding: 0;
+    margin: 0 0 10px;
+    line-height: 1.8;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+}
+.hljs {
+    padding: 0.5em 1em !important;
+}
+
+/* Label type hints */
+.label.type-hint {
+    background-color: #5897DF;
+}
+
+
+/* Method lists */
+ul.methods {
+    list-style: none;
+    padding-left: 0;
+}
