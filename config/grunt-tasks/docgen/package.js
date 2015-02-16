@@ -29,7 +29,7 @@ module.exports = new Package('appverse-dgeni', [
 
 // Configure bower package name
 .config(function(packageNameProcessor) {
-  packageNameProcessor.packageName = 'appverse-web-html5-core';
+  packageNameProcessor.packageName = 'appverse-web-html5-security';
 })
 
 // Configure paths for documentation assets (css, images...)
