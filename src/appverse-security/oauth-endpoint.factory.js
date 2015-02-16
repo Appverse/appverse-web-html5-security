@@ -11,9 +11,7 @@
      * OAuth Endpoint service.
      * Contains one factory managing the authorization's (endpoint) URL.
      *
-     * @requires Oauth_AccessToken
-     * @requires $location
-
+     * @requires https://docs.angularjs.org/api/ng/service/$location $location
      */
     function OauthEndpointFactory ($location) {
 

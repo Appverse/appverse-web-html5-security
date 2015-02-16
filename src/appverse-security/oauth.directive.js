@@ -13,15 +13,15 @@
    * Data in declaration overwrites data from configuration files.
    *
    * @restrict B
-   * @requires AppConfiguration.constant:SECURITY_OAUTH
-   * @requires appverse.security.factory:Oauth_AccessToken
-   * @requires appverse.security.factory:Oauth_Endpoint
-   * @requires appverse.security.factory:Oauth_Profile
-   * @requires $location
-   * @requires $rootScope
-   * @requires $compile
-   * @requires $http
-   * @requires $templateCache
+   * @requires SECURITY_OAUTH
+   * @requires Oauth_AccessToken
+   * @requires Oauth_Endpoint
+   * @requires Oauth_Profile
+   * @requires https://docs.angularjs.org/api/ng/service/$location $location
+   * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
+   * @requires https://docs.angularjs.org/api/ng/service/$compile $compile
+   * @requires https://docs.angularjs.org/api/ng/service/$http $http
+   * @requires https://docs.angularjs.org/api/ng/service/$templateCache $templateCache
    *
    * @example
    <example module="appverse.security">
@@ -79,17 +79,17 @@
        * @description set defaults into the scope object
        */
      function init () {
-        scope.site = scope.site || SECURITY_OAUTH.scopeURL;
-        scope.clientID = scope.clientID || SECURITY_OAUTH.clientID;
-        scope.redirect = scope.redirect || SECURITY_OAUTH.redirect;
-        scope.scope = scope.scope || SECURITY_OAUTH.scope;
-        scope.flow = scope.flow || SECURITY_OAUTH.flow;
-        scope.view = scope.view || SECURITY_OAUTH.view;
-        scope.storage = scope.storage || SECURITY_OAUTH.storage;
-        scope.scope = scope.scope || SECURITY_OAUTH.scope;
+        scope.site          = scope.site || SECURITY_OAUTH.scopeURL;
+        scope.clientID      = scope.clientID || SECURITY_OAUTH.clientID;
+        scope.redirect      = scope.redirect || SECURITY_OAUTH.redirect;
+        scope.scope         = scope.scope || SECURITY_OAUTH.scope;
+        scope.flow          = scope.flow || SECURITY_OAUTH.flow;
+        scope.view          = scope.view || SECURITY_OAUTH.view;
+        scope.storage       = scope.storage || SECURITY_OAUTH.storage;
+        scope.scope         = scope.scope || SECURITY_OAUTH.scope;
         scope.authorizePath = scope.authorizePath || SECURITY_OAUTH.scope_authorizePath;
-        scope.tokenPath = scope.tokenPath || SECURITY_OAUTH.scope_tokenPath;
-        scope.template = scope.template || SECURITY_OAUTH.scope_template;
+        scope.tokenPath     = scope.tokenPath || SECURITY_OAUTH.scope_tokenPath;
+        scope.template      = scope.template || SECURITY_OAUTH.scope_template;
       }
 
       /**

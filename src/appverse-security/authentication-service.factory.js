@@ -9,7 +9,13 @@
      * @module  appverse.security
      * @description Exposes some useful methods for apps developers.
      *
+     * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
      * @requires UserService
+     * @requires Base64
+     * @requires https://docs.angularjs.org/api/ng/service/$http $http
+     * @requires https://docs.angularjs.org/api/ng/service/$q $q
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
+     * @requires SECURITY_GENERAL
      */
     function AuthenticationServiceFactory ($rootScope, UserService, Base64, $http, $q, $log, SECURITY_GENERAL) {
 

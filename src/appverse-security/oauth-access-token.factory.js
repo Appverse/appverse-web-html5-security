@@ -11,8 +11,8 @@
      * OAuth access token service.
      * Management of the access token.
      *
-     * @requires $location
-     * @requires $cookies
+     * @requires https://docs.angularjs.org/api/ng/service/$location $location
+     * @requires https://docs.angularjs.org/api/ng/service/$cookie $cookies
      * @requires CacheFactory
      */
     function OauthAccessTokenFactory ($location, $cookies, CacheFactory, UserService) {

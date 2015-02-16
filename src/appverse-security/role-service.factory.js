@@ -9,7 +9,7 @@
      * @module  appverse.security
      * @description Manages user's roles.
      *
-     * @requires $log
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
      * @requires AppConfiguration.constant:AUTHORIZATION_DATA
      * @requires AppCache.factory:CacheFactory
      */

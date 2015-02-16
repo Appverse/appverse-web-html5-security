@@ -119,6 +119,12 @@
      * C-INTERNAL AUTHORIZATION
      *  It handles access to site sections
      *  Includes roles management and rights checking
+     *
+     * @requires https://docs.angularjs.org/api/ngCookies  ngCookies
+     * @requires AppCache
+     * @requires AppConfiguration
+     * @requires AppUtils
+     * @requires AppREST
      */
     angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies

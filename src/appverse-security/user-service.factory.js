@@ -11,7 +11,7 @@
      * @description
      * Handles the user in the app.
      *
-     * @requires $log
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
      * @requires CacheFactory
      */
     function UserServiceFactory ($log, CacheFactory) {

@@ -11,9 +11,10 @@
      * Requests wrapper. It wraps every request setting needed header by injecting
      * the access token into the header
      *
+     * @requires https://docs.angularjs.org/api/ng/service/$log $log
      * @requires Oauth_AccessToken
-     * @requires Oauth_Endpoint
-     * @requires $http
+     * @requires REST_CONFIG
+     * @requires SECURITY_GENERAL
      */
     function OauthRequestWrapperFactory ($log, $browser, Oauth_AccessToken, REST_CONFIG, SECURITY_GENERAL) {
         var factory = {};
@@ -50,6 +51,7 @@
 
         /**
          * Set security request headers
+         *
          * @param {string} token The token value from the oauth server
          * @param {object} wrappedRestangular The Restangular object
          */
@@ -109,11 +111,11 @@
 
 
     /**
-     * @function
+     * Parse a request and location URL and determine whether this is a same-domain request.
+     *
      * @param {string} requestUrl The url of the request.
      * @param {string} locationUrl The current browser location url.
      * @returns {boolean} Whether the request is for the same domain.
-     * @description Parse a request and location URL and determine whether this is a same-domain request.
      */
     function isSameDomain(requestUrl, locationUrl) {
         var IS_SAME_DOMAIN_URL_MATCH = /^(([^:]+):)?\/\/(\w+:{0,1}\w*@)?([\w\.-]*)?(:([0-9]+))?(.*)$/;
