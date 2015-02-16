@@ -4,14 +4,14 @@ var
 autoloadGruntTasks = require('load-grunt-tasks'),
 calculateTimeSpent = require('time-grunt'),
 connectLiveReload  = require('connect-livereload'),
-bowerJson          = require('./bower.json'),
+bowerFile          = require('./bower.json'),
 LIVERELOAD_PORT    = 35729,
 liveReloadSnippet  = connectLiveReload({port: LIVERELOAD_PORT});
 
 var
 configPaths = {
-    src: bowerJson.appPath || 'src',
-    bowerComponents : bowerJson.directory || 'bower_components',
+    src: bowerFile.appPath || 'src',
+    bowerComponents : bowerFile.directory || 'bower_components',
     demo : 'demo',
     dist: 'dist',
     doc: 'doc',
@@ -88,7 +88,8 @@ module.exports = function (grunt) {
                 }]
             },
             coverage : '<%= configPaths.coverage %>/**',
-            server: '.tmp'
+            server: '.tmp',
+            doc: 'doc/' + bowerFile.version
         },
 
         bump: {
@@ -365,6 +366,16 @@ module.exports = function (grunt) {
         'protractor_webdriver',
         'exec:protractor_start',
     ]);
+
+
+    // ------ Doc tasks -----
+
+    grunt.registerTask('doc', [
+        'clean:doc',
+        'docgen'
+    ]);
+
+    grunt.registerTask('docgen', 'Generates docs', require('./config/grunt-tasks/docgen/grunt-task'));
 
     // ------ Other -----
 

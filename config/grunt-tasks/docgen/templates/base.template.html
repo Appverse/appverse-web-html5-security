@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Appverse documentation</title>
+    <!-- Latest compiled and minified Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <!-- Optional Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <!-- Google Font -->
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <!-- Own Css -->
+    <link rel="stylesheet" href="assets/css/docs.css">
+    <!-- Css for code highlighting -->
+    <link rel="stylesheet" href="assets/css/docco.min.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body ng-app="docs">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-default navbar-static-top horizontal-gradient">
+      <div class="container">
+        <div class="navbar-header">
+          <!-- Button for showing links in mobile view -->
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">
+            <img src="assets/images/logo.png" alt="Appverse documentation">
+          </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="index.html">Docs Home <small>v{$ version $}</small> </span></a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container">
+        <div class="row">
+          <!-- Side menu -->
+          <div class="col-md-3">
+
+            <div class="gray-links no-underline-links">
+              <ul class="no-list-style higher-lis">
+              {% for aDoc in docs %}
+                {% if aDoc.docType == 'module' %}
+                  <li class="list-section">
+
+                    <div class="section-title">
+                        {$ aDoc.id | link(aDoc.name, aDoc, doc) $}
+                    </div>
+
+                    {% if aDoc.componentGroups.length %}
+                    <div class="section-body">
+                      <ul class="no-list-style list-less-left-padding">
+                        {% for componentGroup in aDoc.componentGroups %}
+                        <li>
+                          {$ (componentGroup.groupType + 's') | code $}
+                          <ul class="no-list-style">
+                            {% for component in componentGroup.components %}
+                              <li>{$ component.id | link(component.name, component) $}</li>
+                            {% endfor %}
+                          </ul>
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                    {% endif %}
+
+                  </li>
+                {% endif %}
+              {% endfor %}
+              </ul>
+            </div>
+
+          </div>
+          <!-- View placeholder -->
+          <div class="col-md-9">
+            {% block content %}
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ........................... Scripts ......................... -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Latest compiled and minified Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <!-- For code highlighting -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </body>
+</html>
+
+
+
+

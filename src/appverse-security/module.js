@@ -100,8 +100,10 @@
     // CONFIGURATION: SECURITY_OAUTH
     //////////////////////////////////////////////////////////////////////////////
 
-    /*@ngdoc module
+    /**
+     * @ngdoc module
      * @name appverse.security
+     *
      * @description
      * 3 services:
      *

@@ -5,13 +5,15 @@
 
     /**
      * @ngdoc service
-     * @name appverse.security.factory:Oauth_AccessToken
-     * @requires $location
-     * @requires $cookies
-     * @requires CacheFactory
+     * @name Oauth_AccessToken
+     * @module  appverse.security
      * @description
      * OAuth access token service.
      * Management of the access token.
+     *
+     * @requires $location
+     * @requires $cookies
+     * @requires CacheFactory
      */
     function OauthAccessTokenFactory ($location, $cookies, CacheFactory, UserService) {
 
@@ -22,8 +24,7 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#get
-         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @name Oauth_AccessToken#get
          * @description Returns the access token.
          * @returns {object} The user token from the oauth server
          */
@@ -34,8 +35,7 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#getXSRF
-         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @name Oauth_AccessToken#getXSRF
          * @description Returns the XSRF token to be input in each request header.
          * @returns {object} The xsrf token from the oauth server in the current session
          */
@@ -47,13 +47,13 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#set
-         * @methodOf appverse.security.factory:Oauth_AccessToken
-         * @param {object} scope The current scope
+         * @name Oauth_AccessToken#set
          * @description
          * Sets and returns the access token taking it from the fragment URI or eventually
          * from the cookies. Use `AccessToken.init()` to load (at boot time) the access token.
          * @returns {object} The user token from the oauth server
+         *
+         * @param {object} scope The current scope
          */
         factory.set = function (scope) {
             // take the token from the query string and eventually save it in the cookies
@@ -72,10 +72,10 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#destroy
-         * @methodOf appverse.security.factory:Oauth_AccessToken
-         * @param {object} scope The current scope
+         * @name Oauth_AccessToken#destroy
          * @description Delete the access token and remove the cookies.
+         *
+         * @param {object} scope The current scope
          * @returns {object} The user token from the oauth server
          */
         factory.destroy = function (scope) {
@@ -88,9 +88,9 @@
 
         /**
          * @ngdoc method
-         * @name appverse.security.factory:Oauth_AccessToken#expired
-         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @name Oauth_AccessToken#expired
          * @description Tells when the access token is expired.
+         *
          * @returns {boolean} True or false if the token is expired
          */
         factory.expired = function () {
