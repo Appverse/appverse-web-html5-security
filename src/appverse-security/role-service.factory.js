@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('RoleService', RoleServiceFactory);
@@ -12,7 +12,7 @@
      * @description
      * Manages user's roles.
      */
-    function RoleServiceFactory ($log, AUTHORIZATION_DATA, CacheFactory) {
+    function RoleServiceFactory($log, AUTHORIZATION_DATA, CacheFactory) {
 
         return {
             /**
@@ -50,8 +50,8 @@
              * @returns {boolean} True if the user has that role
              */
             validateRoleInUserOther: function (role) {
-                if (CacheFactory._browserCache.currentUser) {
-                    var user = CacheFactory._browserCache.currentUser;
+                var user = CacheFactory._browserCache.get('loggedUser');
+                if (user) {
                     return _.contains(role, user.roles);
                 } else {
                     return false;

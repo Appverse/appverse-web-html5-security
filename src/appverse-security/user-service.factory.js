@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('UserService', UserServiceFactory);
@@ -11,7 +11,7 @@
      * @description
      * Handles the user in the app.
      */
-    function UserServiceFactory ($log, CacheFactory) {
+    function UserServiceFactory($log, CacheFactory) {
 
         return {
             /**
@@ -19,7 +19,7 @@
              * @name appverse.security.factory:UserService#setCurrentUser
              * @methodOf appverse.security.factory:UserService
              * @param {appverse.security.global:User} loggedUser The currently logged user
-             * @description Writes the current user in cache ('currentUser').
+             * @description Writes the current user in cache ('loggedUser').
              */
             setCurrentUser: function (loggedUser) {
 
@@ -37,7 +37,7 @@
              * @ngdoc method
              * @name appverse.security.factory:UserService#getCurrentUser
              * @methodOf appverse.security.factory:UserService
-             * @description Retrieves the current user from cache ('currentUser').
+             * @description Retrieves the current user from cache ('loggedUser').
              * @returns {appverse.security.global:User} The currently logged user
              */
             getCurrentUser: function () {
@@ -54,7 +54,7 @@
              * @param {appverse.security.global:User} loggedUser The currently logged user
              * @description Removes the current user from the app, including cache.
              */
-            removeUser: function (loggedUser) {
+            removeUser: function () {
                 CacheFactory._browserCache.remove('loggedUser');
             }
         };
