@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     ////////////////////////////////////////////////////////////////////////////
@@ -120,21 +120,29 @@
      */
     angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies
-        'AppCache', // Common API Module: cache services
-        'AppConfiguration', // Common API Module: configuration
-        'AppUtils',
-        'AppREST'
+        'appverse.configuration', // Common API Module
+        'appverse.utils',
+        'ngResource'
     ])
-    .config(configModule)
-    .run(run);
+        .config(configModule)
+        .run(run);
 
+    function configModule($provide, $httpProvider, ModuleSeekerProvider) {
 
-    function configModule($provide, $httpProvider) {
+        if (!ModuleSeekerProvider.exists('appverse.cache')) {
 
-        function oauthResponseInterceptor ($q, $log, $injector) {
+            //appverse.cache module not found. Adding basic CacheFactory.
+            $provide.factory('CacheFactory', function ($cacheFactory) {
+                return {
+                    _browserCache: $cacheFactory('basicCache')
+                };
+            });
+        }
+
+        function oauthResponseInterceptor($q, $log, $injector) {
 
             return {
-                'response': function(response) {
+                'response': function (response) {
 
                     // Injected manually because of a circular dependency problem:
                     // $http -> interceptor -> Oauth_AccessToken -> CacheFactory -> $http
@@ -148,13 +156,13 @@
                     if (tokenInHeader) {
                         oauthAccessTokenService.setFromHeader(tokenInHeader);
                     }
-                     return response;
+                    return response;
                 }
 
             };
         }
 
-        oauthResponseInterceptor.$inject =  ['$q', '$log', '$injector'];
+        oauthResponseInterceptor.$inject = ['$q', '$log', '$injector'];
         $provide.factory('oauthResponseInterceptor', oauthResponseInterceptor);
         $httpProvider.interceptors.push('oauthResponseInterceptor');
 
@@ -183,9 +191,11 @@
         $httpProvider.responseInterceptors.push(logsOutUserOn401);
     }
 
+    function run($log) {
 
-    function run ($log) {
-        $log.info('appverse.security run');
+        $log.debug('appverse.security run');
+
+
     }
 
 })();
