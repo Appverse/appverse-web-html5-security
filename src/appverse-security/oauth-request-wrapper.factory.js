@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('Oauth_RequestWrapper', OauthRequestWrapperFactory);
@@ -14,9 +14,9 @@
      * Requests wrapper. It wraps every request setting needed header by injecting
      * the access token into the header
      */
-    function OauthRequestWrapperFactory ($log, $browser, Oauth_AccessToken, REST_CONFIG, SECURITY_GENERAL) {
+    function OauthRequestWrapperFactory($log, $browser, Oauth_AccessToken, REST_CONFIG, SECURITY_GENERAL) {
+
         var factory = {};
-        //var token;
 
         /**
          * @ngdoc method
@@ -28,15 +28,16 @@
          * @returns {object} the modified Restangular object
          */
         factory.wrapRequest = function (restangular) {
+
             var token = Oauth_AccessToken.get();
             var wrappedRestangular = restangular;
 
             if (token) {
-                 $log.debug("OAuth token is present and valid. The wrapped request is secure.");
+                $log.debug("OAuth token is present and valid. The wrapped request is secure.");
                 setRequestHeaders(token, restangular);
             } else {
                 $log
-                .debug("OAuth token is not present yet. The wrapped request will not be secure.");
+                    .debug("OAuth token is not present yet. The wrapped request will not be secure.");
             }
 
             return wrappedRestangular;
@@ -121,8 +122,9 @@
         var IS_SAME_DOMAIN_URL_MATCH = /^(([^:]+):)?\/\/(\w+:{0,1}\w*@)?([\w\.-]*)?(:([0-9]+))?(.*)$/;
         var match = IS_SAME_DOMAIN_URL_MATCH.exec(requestUrl);
         // if requestUrl is relative, the regex does not match.
-        if (match == null)
+        if (match === null) {
             return true;
+        }
 
         var domain1 = {
             protocol: match[2],
