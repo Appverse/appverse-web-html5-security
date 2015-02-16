@@ -15,27 +15,21 @@
 
     <script src="angular/angular.js"></script>
     <script src="angular-cookies/angular-cookies.js"></script>
-    <script src="angular-route/angular-route.js"></script>
-    <script src="lodash/dist/lodash.min.js"></script>
-    <script src="restangular/dist/restangular.min.js"></script>
-    <script src="angular-cache/dist/angular-cache.js"></script>
     <script src="angular-resource/angular-resource.js"></script>
     <script src="angular-touch/angular-touch.js"></script>
 
-    <script src="appverse-web-html5-core/dist/api-cache/api-cache.min.js"></script>
-    <script src="appverse-web-html5-core/dist/api-logging/api-logging.min.js"></script>
-    <script src="appverse-web-html5-core/dist/api-main/api-main.min.js"></script>
-    <script src="appverse-web-html5-core/dist/api-utils/api-utils.min.js"></script>
-    <script src="appverse-web-html5-core/dist/api-rest/api-rest.min.js"></script>
-    <script src="appverse-web-html5-core/dist/api-main/api-main.min.js"></script>
+    <script src="appverse-web-html5-core/dist/appverse-logging/appverse-logging.min.js"></script>
+    <script src="appverse-web-html5-core/dist/appverse-utils/appverse-utils.min.js"></script>
+    <script src="appverse-web-html5-core/dist/appverse/appverse.min.js"></script>
 
     <!-- ########## Core security module module ########## -->
     <script src="appverse-security/appverse-security.min.js"></script>
 
+
     <script>
-        angular.module('security-demo-app', ['appverse.security', 'COMMONAPI'])
+        angular.module('security-demo-app', ['appverse', 'appverse.security', 'appverse.logging'])
             .run(function ($log) {
-                //
+                $log.debug('security-demo-app run');
             });
         AppInit.setConfig({
             environment: {
