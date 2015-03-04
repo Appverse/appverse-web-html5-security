@@ -1,7 +1,10 @@
 {
   "name": "appverse-web-html5-security",
   "version": "0.4.0",
-  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Appverse/appverse-web-html5-security"
+  },
   "devDependencies": {
     "canonical-path": "0.0.2",
     "connect-livereload": "~0.5.2",
