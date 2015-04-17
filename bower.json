@@ -1,16 +1,16 @@
 {
-  "name": "appverse-web-html5-security",
-  "description": "Appverse web html5 security module.",
-  "version": "0.5.0-dev",
-  "main": "src/modules/api-security.js",
-  "dependencies": {
-    "appverse-web-html5-core": "~0.4.0"
-  },
-  "devDependencies": {
-    "angular-mocks": "~1.2.28",
-    "angular-scenario": "~1.2.28"
-  },
-  "ignore": [
+    "name": "appverse-web-html5-security",
+    "description": "Appverse web html5 security module.",
+    "version": "0.5.0-dev",
+    "main": "src/modules/api-security.js",
+    "dependencies": {
+        "appverse-web-html5-core": "~0.4.0"
+    },
+    "devDependencies": {
+        "angular-mocks": "1.3.15",
+        "angular-scenario": "1.3.15"
+    },
+    "ignore": [
     "bower_components",
     "config",
     "demo",
@@ -25,7 +25,7 @@
     "sonar-project.properties",
     "changelog.js"
   ],
-  "resolutions": {
-    "angular": "~1.2.28"
-  }
+    "resolutions": {
+        "angular": "1.3.15"
+    }
 }
