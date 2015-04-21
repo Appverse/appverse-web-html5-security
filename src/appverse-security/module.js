@@ -176,27 +176,24 @@
 
 
         var logsOutUserOn401 = ['$q', '$location', function ($q, $location) {
-            var success = function (response) {
-                return response;
-            };
 
-            var error = function (response) {
-                if (response.status === 401) {
-                    //Redirects them back to main/login page
-                    $location.path('/home');
+            return {
+                'responseError': function (rejection) {
+                    if (rejection.status === 401) {
+                        //Redirects them back to main/login page
+                        $location.path('/home');
 
-                    return $q.reject(response);
-                } else {
-                    return $q.reject(response);
+                        return $q.reject(rejection);
+                    } else {
+                        return $q.reject(rejection);
+                    }
                 }
             };
 
-            return function (promise) {
-                return promise.then(success, error);
-            };
         }];
 
-        $httpProvider.responseInterceptors.push(logsOutUserOn401);
+        $provide.factory('logsOutUserOn401', logsOutUserOn401);
+        $httpProvider.interceptors.push('logsOutUserOn401');
     }
 
     function run($log) {
