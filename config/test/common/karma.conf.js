@@ -19,6 +19,9 @@ var settings = {
     ],
 
     midwayFiles : [ ],
+
+    plugins : ['karma-jasmine', 'karma-phantomjs-launcher']
+
 };
 
 
@@ -46,4 +49,3 @@ Configurator.prototype.files = function (specificFiles) {
 };
 
 module.exports = new Configurator();
-
