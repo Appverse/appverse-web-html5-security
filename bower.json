@@ -2,8 +2,10 @@
   "name": "appverse-web-html5-security",
   "description": "Appverse web html5 security module.",
   "version": "0.5.1",
-  "main": "src/modules/api-security.js",
+  "main": "dist/appverse-security/appverse-security.min.js",
   "dependencies": {
+    "angular": "~1.5.8",
+    "classie": "~1.0.1",
     "appverse-web-html5-core": "~0.8.0",
     "angular-resource": "1.5.8"
   },
