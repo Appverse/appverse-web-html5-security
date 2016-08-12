@@ -72,6 +72,28 @@
             });
         }
 
+        var requestInterceptor = ['$q', '$location', '$injector',
+            function($q, $location, $injector) {
+                var interceptorInstance = {
+                    request: function(config) {
+                        var url = config.url;
+                        var roleService = $injector.get('NewRoleService');
+                        if (roleService.isPublicRoute(url)) {
+                            //O si es válida para el tipo de usuario
+                        } else {
+                            //si no tiene permisos se le redirecciona
+                            config.url = roleService.getRedirectionUrl();
+                        }
+                        return config || $q.when(config);
+                    }
+                };
+                return interceptorInstance;
+            }
+        ];
+
+        $httpProvider.interceptors.push(requestInterceptor);
+
+
         var logsOutUserOn401 = ['$q', '$location', function($q, $location) {
 
             return {
@@ -91,13 +113,12 @@
 
         $provide.factory('logsOutUserOn401', logsOutUserOn401);
         $httpProvider.interceptors.push('logsOutUserOn401');
+
+
     }
 
     function run($log) {
-
         $log.debug('appverse.security run');
-
-
     }
 
 })();

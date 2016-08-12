@@ -1,0 +1,18 @@
+//Un Json similar a este debe ser incluido en el fichero environment-conf.json de la apicación
+{
+    "ROLE_DATA": {
+        "roles": ["ROLE_4", "ROLE_3", "ROLE_2", "ROLE_1"],
+        "routerRoles": [{
+            "roles": ["ROLE_1", "ROLE_2"],
+            "routes": ["/home", "/login", "/history"]
+        }, {
+            "roles": ["ROLE_3"],
+            "routes": ["/home", "/login", "/history", "/admin"]
+        }, {
+            "roles": ["ROLE_4"],
+            "routes": ["/home", "/login", "/history", "/blog", "/publish", "/edit"]
+        }],
+        "redirection": "/home",
+        "publicRoutes": ["/home", "/login"]
+    }
+}
