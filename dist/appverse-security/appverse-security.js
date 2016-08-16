@@ -126,6 +126,8 @@
      * @requires AppUtils
      * @requires AppREST
      */
+    configModule.$inject = ["$provide", "$httpProvider", "ModuleSeekerProvider"];
+    run.$inject = ["$log"];
     angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies
         'appverse.configuration', // Common API Module
@@ -195,7 +197,6 @@
         $provide.factory('logsOutUserOn401', logsOutUserOn401);
         $httpProvider.interceptors.push('logsOutUserOn401');
     }
-    configModule.$inject = ["$provide", "$httpProvider", "ModuleSeekerProvider"];
 
     function run($log) {
 
@@ -203,13 +204,13 @@
 
 
     }
-    run.$inject = ["$log"];
 
 })();
 
 (function() {
     'use strict';
 
+    AuthenticationServiceFactory.$inject = ["$rootScope", "UserService", "Base64", "$http", "$q", "$log", "SECURITY_GENERAL"];
     angular.module('appverse.security').factory('AuthenticationService', AuthenticationServiceFactory);
 
     /**
@@ -347,12 +348,12 @@
 
         };
     }
-    AuthenticationServiceFactory.$inject = ["$rootScope", "UserService", "Base64", "$http", "$q", "$log", "SECURITY_GENERAL"];
 
 })();
 (function () {
     'use strict';
 
+    OauthAccessTokenFactory.$inject = ["$location", "$cookies", "UserService"];
     angular.module('appverse.security').factory('Oauth_AccessToken', OauthAccessTokenFactory);
 
     /**
@@ -371,7 +372,6 @@
         var factory = {};
         var token = null;
         var xsrfToken = null;
-
 
         /**
          * @ngdoc method
@@ -395,7 +395,6 @@
             return xsrfToken;
         };
 
-
         /**
          * @ngdoc method
          * @name Oauth_AccessToken#set
@@ -414,12 +413,10 @@
             return token;
         };
 
-
         factory.setFromHeader = function (token) {
             setTokenInCurrentUser(token);
             return token;
         };
-
 
         /**
          * @ngdoc method
@@ -436,7 +433,6 @@
             return token;
         };
 
-
         /**
          * @ngdoc method
          * @name Oauth_AccessToken#expired
@@ -447,7 +443,6 @@
         factory.expired = function () {
             return (token && token.expires_at && token.expires_at < new Date());
         };
-
 
         /////////////////////////////Private methods///////////////////////////////////
 
@@ -467,16 +462,12 @@
                 setToken(token, scope);
             }
         }
-
-
         function getTokenFromCache() {
             var user = UserService.getCurrentUser();
             if (user) {
                 token = user.bToken;
             }
         }
-
-
         function getXSRFTokenFromCache() {
                 var user = UserService.getCurrentUser();
                 if (user) {
@@ -507,7 +498,6 @@
                 return params;
             }
         }
-
 
         /**
          * @ngdoc method
@@ -546,7 +536,6 @@
             }
         }
 
-
         function setTokenInCurrentUser(scope, params) {
             if (params && params.access_token) {
                 token = params.access_token;
@@ -562,7 +551,6 @@
             }
 
         }
-
 
         /**
          * @ngdoc method
@@ -585,7 +573,6 @@
             return token;
         }
 
-
         /**
          * @ngdoc method
          * @name appverse.security.factory:Oauth_AccessToken#setExpiresAt
@@ -602,7 +589,6 @@
             }
         }
 
-
         /**
          * @ngdoc method
          * @name appverse.security.factory:Oauth_AccessToken#removeFragment
@@ -616,16 +602,15 @@
             $location.hash('');
         }
 
-
         return factory;
     }
-    OauthAccessTokenFactory.$inject = ["$location", "$cookies", "UserService"];
 
 })();
 
 (function() {
     'use strict';
 
+    OauthEndpointFactory.$inject = ["$location"];
     angular.module('appverse.security').factory('Oauth_Endpoint', OauthEndpointFactory);
 
     /**
@@ -701,12 +686,13 @@
 
         return factory;
     }
-    OauthEndpointFactory.$inject = ["$location"];
 
 })();
+
 (function() {
     'use strict';
 
+    OauthProfileFactory.$inject = ["Oauth_RequestWrapper", "$resource", "SECURITY_OAUTH"];
     angular.module('appverse.security').factory('Oauth_Profile', OauthProfileFactory);
 
     /**
@@ -725,12 +711,13 @@
         });
         return Oauth_RequestWrapper.wrapRequest(resource, ['get']);
     }
-    OauthProfileFactory.$inject = ["Oauth_RequestWrapper", "$resource", "SECURITY_OAUTH"];
 
 })();
+
 (function () {
     'use strict';
 
+    OauthRequestWrapperFactory.$inject = ["$log", "$browser", "Oauth_AccessToken", "REST_CONFIG", "SECURITY_GENERAL"];
     angular.module('appverse.security').factory('Oauth_RequestWrapper', OauthRequestWrapperFactory);
 
     /**
@@ -839,7 +826,6 @@
 
         return factory;
     }
-    OauthRequestWrapperFactory.$inject = ["$log", "$browser", "Oauth_AccessToken", "REST_CONFIG", "SECURITY_GENERAL"];
 
 
     /**
@@ -1073,9 +1059,11 @@
 
 
 })();
+
 (function () {
     'use strict';
 
+    RoleServiceFactory.$inject = ["$log", "AUTHORIZATION_DATA", "CacheFactory"];
     angular.module('appverse.security').factory('RoleService', RoleServiceFactory);
 
     /**
@@ -1138,13 +1126,13 @@
             }
         };
     }
-    RoleServiceFactory.$inject = ["$log", "AUTHORIZATION_DATA", "CacheFactory"];
 
 })();
 
 (function () {
     'use strict';
 
+    UserServiceFactory.$inject = ["$log", "CacheFactory"];
     angular.module('appverse.security').factory('UserService', UserServiceFactory);
 
     /**
@@ -1203,7 +1191,6 @@
             }
         };
     }
-    UserServiceFactory.$inject = ["$log", "CacheFactory"];
 
 
     /**

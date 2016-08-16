@@ -5,8 +5,10 @@ autoloadGruntTasks = require('load-grunt-tasks'),
 calculateTimeSpent = require('time-grunt'),
 connectLiveReload  = require('connect-livereload'),
 bowerFile          = require('./bower.json'),
+serveStatic        = require('serve-static'),
 LIVERELOAD_PORT    = 35729,
 liveReloadSnippet  = connectLiveReload({port: LIVERELOAD_PORT});
+
 
 var
 configPaths = {
@@ -398,7 +400,7 @@ module.exports = function (grunt) {
 /*---------------------------------------- HELPER METHODS -------------------------------------*/
 
 function mountFolder (connect, dir, options) {
-    return connect.static(require('path').resolve(dir), options);
+    return serveStatic(require('path').resolve(dir), options);
 }
 
 /**

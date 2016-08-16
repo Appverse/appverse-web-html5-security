@@ -40,7 +40,7 @@
     <!-- endinjector -->
 
     <script>
-        angular.module('security-demo-app', ['appverse', 'appverse.security', 'appverse.logging'])
+        angular.module('security-demo-app', ['appverse', 'appverse.security', 'appverse.logging', 'ngCookies'])
             .run(function ($log) {
                 $log.debug('security-demo-app run');
             });
