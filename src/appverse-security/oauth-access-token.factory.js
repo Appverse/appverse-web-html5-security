@@ -255,7 +255,7 @@
          * @ngdoc method
          * @name appverse.security.factory:Oauth_AccessToken#removeFragment
          * @methodOf appverse.security.factory:Oauth_AccessToken
-         * @param {object} scope The current scope
+         * @param {object} hash The initial string
          * @description
          * Remove the fragment URI
          */
@@ -272,9 +272,9 @@
                     token = value;
                 }
             }
-            var fragment = 'access_token=' + token + '&';
-            var newURL = hash.replace(fragment, '');
-            $location.hash(newURL);
+            var base = hash.substring(0, hash.lastIndexOf("?")+1);
+            var fragment = base + 'access_token=' + token;
+            $location.hash(fragment);
             $log.debug('OauthAccessTokenFactory.removeFragment: hash' + $location.hash());
 
         }
