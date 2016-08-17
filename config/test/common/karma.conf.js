@@ -23,6 +23,7 @@ var settings = {
 
     plugins: ['karma-jasmine', 'karma-phantomjs-launcher'],
 
+
 };
 
 
