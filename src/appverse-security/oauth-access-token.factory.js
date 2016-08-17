@@ -5,14 +5,12 @@
 
     /**
      * @ngdoc service
-     * @name Oauth_AccessToken
-     * @module  appverse.security
+     * @name appverse.security.factory:Oauth_AccessToken
+     * @requires $location
+     * @requires $cookies
      * @description
      * OAuth access token service.
      * Management of the access token.
-     *
-     * @requires https://docs.angularjs.org/api/ng/service/$location $location
-     * @requires https://docs.angularjs.org/api/ng/service/$cookie $cookies
      */
     function OauthAccessTokenFactory($location, $cookies, UserService, $log) {
 
@@ -20,9 +18,11 @@
         var token = null;
         var xsrfToken = null;
 
+
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#get
+         * @name appverse.security.factory:Oauth_AccessToken#get
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Returns the access token.
          * @returns {object} The user token from the oauth server
          */
@@ -33,7 +33,8 @@
 
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#getXSRF
+         * @name appverse.security.factory:Oauth_AccessToken#getXSRF
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Returns the XSRF token to be input in each request header.
          * @returns {object} The xsrf token from the oauth server in the current session
          */
@@ -42,15 +43,16 @@
             return xsrfToken;
         };
 
+
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#set
+         * @name appverse.security.factory:Oauth_AccessToken#set
+         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @param {object} scope The current scope
          * @description
          * Sets and returns the access token taking it from the fragment URI or eventually
          * from the cookies. Use `AccessToken.init()` to load (at boot time) the access token.
          * @returns {object} The user token from the oauth server
-         *
-         * @param {object} scope The current scope
          */
         factory.set = function(scope) {
             // take the token from the query string and eventually save it in the cookies
@@ -60,37 +62,40 @@
             return token;
         };
 
+
         factory.setFromHeader = function(token) {
             setTokenInCurrentUser(token);
             return token;
         };
 
+
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#destroy
-         * @description Delete the access token and remove the cookies.
-         *
+         * @name appverse.security.factory:Oauth_AccessToken#destroy
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} scope The current scope
+         * @description Delete the access token and remove the cookies.
          * @returns {object} The user token from the oauth server
          */
         factory.destroy = function(scope) {
-            $log.debug('OauthAccessTokenFactory.destroy: ');
             token = null;
             xsrfToken = null;
             delete $cookies[scope.client];
             return token;
         };
 
+
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#expired
+         * @name appverse.security.factory:Oauth_AccessToken#expired
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Tells when the access token is expired.
-         *
          * @returns {boolean} True or false if the token is expired
          */
         factory.expired = function() {
             return (token && token.expires_at && token.expires_at < new Date());
         };
+
 
         /////////////////////////////Private methods///////////////////////////////////
 
@@ -103,8 +108,6 @@
          * Get the access token from a string and save it
          */
         function setTokenFromString(scope) {
-            $log.debug('OauthAccessTokenFactory.setTokenFromString: ');
-
             var token = getTokenFromString($location.hash());
 
             if (token) {
@@ -113,14 +116,14 @@
             }
         }
 
-        function getTokenFromCache() {
-            $log.debug('OauthAccessTokenFactory.getTokenFromCache: ');
 
+        function getTokenFromCache() {
             var user = UserService.getCurrentUser();
             if (user) {
                 token = user.bToken;
             }
         }
+
 
         function getXSRFTokenFromCache() {
             var user = UserService.getCurrentUser();
@@ -138,8 +141,6 @@
          * @returns {object} The value of the token
          */
         function getTokenFromString(hash) {
-            $log.debug('OauthAccessTokenFactory.getTokenFromString: ');
-
             var splitted = hash.split('&');
             var params = {};
 
@@ -155,6 +156,7 @@
             }
         }
 
+
         /**
          * @ngdoc method
          * @name appverse.security.factory:Oauth_AccessToken#setTokenFromCookies
@@ -165,8 +167,6 @@
          * Returns the access token only when the storage attribute is set to 'cookies'.
          */
         function setTokenFromCookies(scope) {
-            $log.debug('OauthAccessTokenFactory.setTokenFromCookies: ' + $cookies[scope.client]);
-
             if (scope.storage === 'cookies') {
                 if ($cookies[scope.client]) {
                     var params = JSON.parse($cookies[scope.client]);
@@ -187,8 +187,6 @@
          * Save the access token only when the storage attribute is set to 'cookies'.
          */
         function setTokenInCookies(scope, params) {
-            $log.debug('OauthAccessTokenFactory.setTokenInCookies: ');
-
             if (scope.storage === SECURITY_OAUTH.storage_cookies) {
                 if (params && params.access_token) {
                     $cookies[scope.client] = JSON.stringify(params);
@@ -196,9 +194,8 @@
             }
         }
 
-        function setTokenInCurrentUser(scope, params) {
-            $log.debug('OauthAccessTokenFactory.setTokenInCurrentUser: ');
 
+        function setTokenInCurrentUser(scope, params) {
             if (params && params.access_token) {
                 token = params.access_token;
                 //token =  JSON.stringify(params);
@@ -214,6 +211,7 @@
 
         }
 
+
         /**
          * @ngdoc method
          * @name appverse.security.factory:Oauth_AccessToken#setToken
@@ -225,8 +223,6 @@
          * @returns {object} The token value
          */
         function setToken(params, scope) {
-            $log.debug('OauthAccessTokenFactory.setToken: ');
-
             token = token || {}; // init the token
             angular.extend(token, params); // set the access token params
             setExpiresAt(); // set the expiring time
@@ -237,6 +233,7 @@
             return token;
         }
 
+
         /**
          * @ngdoc method
          * @name appverse.security.factory:Oauth_AccessToken#setExpiresAt
@@ -245,8 +242,6 @@
          * Set the access token expiration date (useful for refresh logics)
          */
         function setExpiresAt() {
-            $log.debug('OauthAccessTokenFactory.setExpiresAt: ');
-
             if (token) {
                 var expires_at = new Date();
                 // 60 seconds less to secure browser and response latency
@@ -254,6 +249,7 @@
                 token.expires_at = expires_at;
             }
         }
+
 
         /**
          * @ngdoc method
@@ -264,18 +260,25 @@
          * Remove the fragment URI
          */
         function removeFragment() {
-            $log.debug('OauthAccessTokenFactory.removeFragment: ');
 
-            //TODO we need to let the fragment live if it's not the access token
-            //$location.hash('');
+            var splitted = hash.split('&');
+            var token;
 
-            var stringUrl = $location.hash();
-            var fragment = stringUrl.substring(stringUrl.lastIndexOf("client_id=") + 1, stringUrl.lastIndexOf("redirect_uri="));
-            var newURL = stringUrl.replace(fragment, '');
+            for (var i = 0; i < splitted.length; i++) {
+                var param = splitted[i].split('=');
+                var key = param[0];
+                var value = param[1];
+                if (key == 'access_token') {
+                    token = value;
+                }
+            }
+            var fragment = 'access_token=' + token + '&';
+            var newURL = hash.replace(fragment, '');
             $location.hash(newURL);
             $log.debug('OauthAccessTokenFactory.removeFragment: hash' + $location.hash());
 
         }
+
 
         return factory;
     }
