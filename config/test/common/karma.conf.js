@@ -18,9 +18,10 @@ var settings = {
         'test/unit/**/*.js'
     ],
 
+
     midwayFiles: [],
 
-    plugins: ['karma-jasmine', 'karma-phantomjs-launcher']
+    plugins: ['karma-jasmine', 'karma-phantomjs-launcher'],
 
 };
 
