@@ -7,6 +7,7 @@ describe('OAuth Directive: ', function() {
 
         var $compile;
         var $rootScope;
+        var $location;
 
         var directiveHtml = '' +
             '<oauth ng-cloak' +
@@ -20,13 +21,14 @@ describe('OAuth Directive: ', function() {
 
         // Store references to $rootScope and $compile
         // so they are available to all tests in this describe block
-        beforeEach(inject(function(_$compile_, _$rootScope_) {
+        beforeEach(inject(function(_$compile_, _$rootScope_, _$location_) {
             // The injector unwraps the underscores (_) from around the parameter names when matching
             $compile = _$compile_;
             $rootScope = _$rootScope_;
+            $location = _$location_;
         }));
 
-        it('should show a sign in button', function() {
+        it('should removeFragment', function() {
             // Compile a piece of HTML containing the directive
             var element = $compile(directiveHtml)($rootScope);
             // fire all the watches, so text is evaluated
@@ -34,6 +36,7 @@ describe('OAuth Directive: ', function() {
             // Check that the compiled element contains the templated content
             element.html().should.be.equal('Sign In');
         });
+
     });
 
 });

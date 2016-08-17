@@ -111,7 +111,7 @@
             var token = getTokenFromString($location.hash());
 
             if (token) {
-                removeFragment();
+                removeFragment($location.hash());
                 setToken(token, scope);
             }
         }
@@ -259,7 +259,7 @@
          * @description
          * Remove the fragment URI
          */
-        function removeFragment() {
+        function removeFragment(hash) {
 
             var splitted = hash.split('&');
             var token;
