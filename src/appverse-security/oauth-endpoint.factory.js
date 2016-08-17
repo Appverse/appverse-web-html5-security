@@ -27,7 +27,7 @@
          * @returns {String} The URL for the oauth endpoint
          */
         factory.set = function(scope) {
-            $log.debug('OauthEndpointFactory.set: ');
+            $log.debug('OauthEndpointFactory.set');
             url = scope.site +
                 scope.authorizePath +
                 '?response_type=token' + '&' +
@@ -47,7 +47,7 @@
          * @returns {String} The URL for the oauth endpoint
          */
         factory.get = function() {
-            $log.debug('OauthAccessTokenFactory.get: ');
+            $log.debug('OauthAccessTokenFactory.get');
             return url;
         };
 
@@ -57,7 +57,7 @@
          * @description Redirects the app to the authorization URL.
          */
         factory.redirect = function() {
-            $log.debug('OauthAccessTokenFactory.redirect: ');
+            $log.debug('OauthAccessTokenFactory.redirect');
 
             window.location.replace(url);
         };

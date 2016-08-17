@@ -30,7 +30,7 @@
          * @returns {object} the modified Restangular object
          */
         factory.wrapRequest = function (restangular) {
-          $log.debug('OauthRequestWrapperFactory.wrapRequest: ');
+          $log.debug('OauthRequestWrapperFactory.wrapRequest');
 
             var token = Oauth_AccessToken.get();
             var wrappedRestangular = restangular;
@@ -58,7 +58,7 @@
          * @param {object} wrappedRestangular The Restangular object
          */
         function setRequestHeaders(token, wrappedRestangular) {
-          $log.debug('OauthRequestWrapperFactory.setRequestHeaders: ');
+          $log.debug('OauthRequestWrapperFactory.setRequestHeaders');
 
             $log.debug('token: ' + token);
             $log.debug('is same domain? ' + isSameDomain(REST_CONFIG.BaseUrl, $browser.url()));

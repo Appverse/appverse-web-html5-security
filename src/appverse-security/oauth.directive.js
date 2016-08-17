@@ -103,7 +103,7 @@
        * the template together.
        */
       function compile () {
-        $log.debug('oauth.compile: ');
+        $log.debug('oauth.compile');
 
         $http.get(scope.template, {
             //This allows you can get the template again by consuming the
@@ -122,7 +122,7 @@
        * Gets the profile info.
        */
       function initProfile () {
-        $log.debug('oauth.initProfile: ');
+        $log.debug('oauth.initProfile');
 
         var token = AccessToken.get();
         if (token && token.access_token && SECURITY_OAUTH.profile)
@@ -135,7 +135,7 @@
        * Sets the actual visualization status for the widget.
        */
       function initView (token) {
-        $log.debug('oauth.initView: ');
+        $log.debug('oauth.initView');
 
         var token = AccessToken.get();
         // There is not token: without access token it's logged out
@@ -153,12 +153,12 @@
       }
 
       scope.login = function() {
-        $log.debug('oauth.scope.login: ');
+        $log.debug('oauth.scope.login');
         Endpoint.redirect();
       }
 
       scope.logout = function() {
-        $log.debug('oauth.scope.logout: ');
+        $log.debug('oauth.scope.logout');
         AccessToken.destroy(scope);
         loggedOut();
       }
@@ -168,7 +168,7 @@
        * @description
        */
       function loggedIn(){
-        $log.debug('oauth.loggedIn: ');
+        $log.debug('oauth.loggedIn');
         $rootScope.$broadcast('oauth:success', AccessToken.get());
         scope.show = 'logout';
       }
@@ -178,7 +178,7 @@
        * @description
        */
       function loggedOut () {
-        $log.debug('oauth.loggedOut: ');
+        $log.debug('oauth.loggedOut');
         $rootScope.$broadcast('oauth:logout');
         scope.show = 'login';
       }
@@ -188,7 +188,7 @@
        * @description
        */
       function denied(){
-        $log.debug('oauth.denied: ');
+        $log.debug('oauth.denied');
         scope.show = 'denied';
         $rootScope.$broadcast('oauth:denied');
       }
