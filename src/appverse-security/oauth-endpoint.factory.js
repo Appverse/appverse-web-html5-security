@@ -13,26 +13,10 @@
      *
      * @requires https://docs.angularjs.org/api/ng/service/$location $location
      */
-    function OauthEndpointFactory ($location) {
+    function OauthEndpointFactory($location, $log) {
 
         var factory = {};
         var url;
-
-        //TODO Check against other oauth providers (linkedin, twitter).
-
-        /*
-         *NOTE
-         *Google uses the same url for authentication and authorization, so just
-         *redirect your users to the authorize url with the appropriate parameters in
-         *the query string. Google then determines if the user needs to login,
-         *authorize your app, or both.
-         *The flow would go something like this...
-         *1-Get the request token
-         *2-Redirect your users to the authorization link
-         *https://www.google.com/accounts/OAuthAuthorizeToken?scope=http%3A%2F%2Fwww.google.com%2Fm8%2Ffeeds&oauth_token=REQUEST_TOKEN&oauth_callback=http%3A%2F%2Fwww.mysite.com%2Fcallback
-         *3-User authorizes your app, then exchange the request token for an access token.
-         */
-
 
         /**
          * @ngdoc method
@@ -42,7 +26,8 @@
          * @param {object} scope The current scope
          * @returns {String} The URL for the oauth endpoint
          */
-        factory.set = function (scope) {
+        factory.set = function(scope) {
+            $log.debug('OauthEndpointFactory.set');
             url = scope.site +
                 scope.authorizePath +
                 '?response_type=token' + '&' +
@@ -54,14 +39,15 @@
             return url;
         };
 
-        /**
+      /**
          * @ngdoc method
          * @name Oauth_Endpoint#get
          * @description Returns the authorization URL.
          *
          * @returns {String} The URL for the oauth endpoint
          */
-        factory.get = function () {
+        factory.get = function() {
+            $log.debug('OauthAccessTokenFactory.get');
             return url;
         };
 
@@ -70,7 +56,9 @@
          * @name Oauth_Endpoint#redirect
          * @description Redirects the app to the authorization URL.
          */
-        factory.redirect = function () {
+        factory.redirect = function() {
+            $log.debug('OauthAccessTokenFactory.redirect');
+
             window.location.replace(url);
         };
 

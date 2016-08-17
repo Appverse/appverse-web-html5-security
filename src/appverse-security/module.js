@@ -160,7 +160,7 @@
 
                     // Retrieves bearer/oauth token from header
                     var tokenInHeader = response.headers('X-XSRF-Cookie');
-                    $log.debug('X-XSRF-Cookie: ' + tokenInHeader);
+                    $log.debug('oauthResponseInterceptor X-XSRF-Cookie: ' + tokenInHeader);
                     if (tokenInHeader) {
                         oauthAccessTokenService.setFromHeader(tokenInHeader);
                     }

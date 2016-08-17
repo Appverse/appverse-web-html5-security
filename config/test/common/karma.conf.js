@@ -2,11 +2,11 @@
 
 var settings = {
 
-    basePath : '../../',
+    basePath: '../../',
 
     frameworks: ['mocha', 'chai', 'sinon'],
 
-    commonFiles : [
+    commonFiles: [
         'bower_components/angular/angular.js',
         'bower_components/angular-mocks/angular-mocks.js',
         'src/appverse-*/**/module.js',
@@ -14,37 +14,38 @@ var settings = {
         'src/appverse-*/**/*.js',
     ],
 
-    unitFiles : [
+    unitFiles: [
         'test/unit/**/*.js'
     ],
 
-    midwayFiles : [ ],
+    midwayFiles: [],
 
-    plugins : ['karma-jasmine', 'karma-phantomjs-launcher']
+    plugins: ['karma-jasmine', 'karma-phantomjs-launcher'],
+
 
 };
 
 
-function Configurator () {
+function Configurator() {
     this._files = [];
     this.basePath = settings.basePath;
     this.frameworks = settings.frameworks;
 }
 
-Configurator.prototype.filesForUnitTests = function () {
+Configurator.prototype.filesForUnitTests = function() {
     return this.withCommonFiles().files(settings.unitFiles);
 };
 
-Configurator.prototype.filesForMidwayTests = function () {
+Configurator.prototype.filesForMidwayTests = function() {
     return this.withCommonFiles().files(settings.midwayFiles);
 };
 
-Configurator.prototype.withCommonFiles = function () {
+Configurator.prototype.withCommonFiles = function() {
     this._files = settings.commonFiles;
     return this;
 };
 
-Configurator.prototype.files = function (specificFiles) {
+Configurator.prototype.files = function(specificFiles) {
     return this._files.concat(specificFiles);
 };
 

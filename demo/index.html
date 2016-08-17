@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Appverse HTML5 Security Demo</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <title>Appverse HTML5 Security Demo</title>
+    </head>
 
-<body data-ng-app="security-demo-app">
-    <h1>APPVERSE HTML5 Security demo</h1>
+    <body data-ng-app="security-demo-app">
+        <h1>APPVERSE HTML5 Security demo</h1>
 
-    <h2>Directive</h2>
-    <oauth ng-cloak id="securityDirective" site="http://myoauthserver.com" client="e72c43c75adc9665e4d4c13354c41f337d5a2e439d3da1243bb47e39745f435c" redirect="http://localhost:9000" scope="resources" profile="http://myoauthserver.com/me" storage="cookies">Sign In
-    </oauth>
+        <h2>Directive</h2>
+        <oauth ng-cloak id="securityDirective" site="http://localhost:9000" client="e72c43c75adc9665e4d4c13354c41f337d5a2e439d3da1243bb47e39745f435c" redirect="http://localhost:9000" scope="resources" profile="http://localhost:9000/me" storage="cookies">Sign In
+        </oauth>
 
-    <script src="angular/angular.js"></script>
-    <script src="angular-cookies/angular-cookies.js"></script>
-    <!--    <script src="angular-route/angular-route.js"></script>-->
-    <!--    <script src="lodash/dist/lodash.min.js"></script>-->
-    <!--    <script src="restangular/dist/restangular.min.js"></script>-->
-    <script src="angular-resource/angular-resource.js"></script>
-    <script src="angular-touch/angular-touch.js"></script>
+        <script src="angular/angular.js"></script>
+        <script src="angular-cookies/angular-cookies.js"></script>
+        <!--    <script src="angular-route/angular-route.js"></script>-->
+        <!--    <script src="lodash/dist/lodash.min.js"></script>-->
+        <!--    <script src="restangular/dist/restangular.min.js"></script>-->
+        <script src="angular-resource/angular-resource.js"></script>
+        <script src="angular-touch/angular-touch.js"></script>
 
-    <script src="appverse-web-html5-core/dist/appverse-logging/appverse-logging.min.js"></script>
-    <script src="appverse-web-html5-core/dist/appverse-utils/appverse-utils.min.js"></script>
-    <!--    <script src="appverse-web-html5-core/dist/appverse-rest/appverse-rest.min.js"></script>-->
-    <script src="appverse-web-html5-core/dist/appverse/appverse.min.js"></script>
+        <script src="appverse-web-html5-core/dist/appverse-logging/appverse-logging.min.js"></script>
+        <script src="appverse-web-html5-core/dist/appverse-utils/appverse-utils.min.js"></script>
+        <!--    <script src="appverse-web-html5-core/dist/appverse-rest/appverse-rest.min.js"></script>-->
+        <script src="appverse-web-html5-core/dist/appverse/appverse.min.js"></script>
 
-    <!-- ########## Core modules: autoinjected. Check gruntfile.js ########## -->
-    <!-- injector:js -->
-    <script src="appverse-security/module.js"></script>
-    <script src="appverse-security/authentication-service.factory.js"></script>
-    <script src="appverse-security/oauth-access-token.factory.js"></script>
-    <script src="appverse-security/oauth-endpoint.factory.js"></script>
-    <script src="appverse-security/oauth-profile.factory.js"></script>
-    <script src="appverse-security/oauth-request-wrapper.factory.js"></script>
-    <script src="appverse-security/oauth.directive.js"></script>
-    <script src="appverse-security/role-service.factory.js"></script>
-    <script src="appverse-security/user-service.factory.js"></script>
-    <!-- endinjector -->
+        <!-- ########## Core modules: autoinjected. Check gruntfile.js ########## -->
+        <!-- injector:js -->
+        <script src="appverse-security/module.js"></script>
+        <script src="appverse-security/authentication-service.factory.js"></script>
+        <script src="appverse-security/oauth-access-token.factory.js"></script>
+        <script src="appverse-security/oauth-endpoint.factory.js"></script>
+        <script src="appverse-security/oauth-profile.factory.js"></script>
+        <script src="appverse-security/oauth-request-wrapper.factory.js"></script>
+        <script src="appverse-security/oauth.directive.js"></script>
+        <script src="appverse-security/role-service.factory.js"></script>
+        <script src="appverse-security/user-service.factory.js"></script>
+        <!-- endinjector -->
 
-    <script>
-        angular.module('security-demo-app', ['appverse', 'appverse.security', 'appverse.logging'])
-            .run(function ($log) {
+        <script>
+            angular.module('security-demo-app', ['appverse', 'appverse.security', 'appverse.logging', 'ngCookies']).run(function($log) {
                 $log.debug('security-demo-app run');
             });
-        AppInit.setConfig({
-            environment: {
-                "SECURITY_GENERAL": {
-                    "securityEnabled": true
+            AppInit.setConfig({
+                environment: {
+                    "SECURITY_GENERAL": {
+                        "securityEnabled": true
+                    }
                 }
-            }
-        });
-    </script>
-</body>
+            });
+        </script>
+
+    </body>
 
 </html>

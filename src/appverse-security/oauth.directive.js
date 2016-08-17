@@ -42,8 +42,8 @@
    * is used to prevent the Angular html template from being briefly displayed by
    * the browser in its raw (uncompiled) form while your application is loading.
    */
-  .directive('oauth', ['SECURITY_OAUTH', 'Oauth_AccessToken', 'Oauth_Endpoint', 'Oauth_Profile' ,'$rootScope', '$compile', '$http', '$templateCache',
-    function(SECURITY_OAUTH, AccessToken, Endpoint, Profile, $rootScope, $compile, $http, $templateCache) {
+  .directive('oauth', ['SECURITY_OAUTH', 'Oauth_AccessToken', 'Oauth_Endpoint', 'Oauth_Profile' ,'$rootScope', '$compile', '$http', '$templateCache', '$log',
+    function(SECURITY_OAUTH, AccessToken, Endpoint, Profile, $rootScope, $compile, $http, $templateCache, $log) {
 
     var definition = {
       restrict: 'AE',
@@ -79,6 +79,8 @@
        * @description set defaults into the scope object
        */
      function init () {
+       $log.debug('oauth.init: ');
+
         scope.site          = scope.site || SECURITY_OAUTH.scopeURL;
         scope.clientID      = scope.clientID || SECURITY_OAUTH.clientID;
         scope.redirect      = scope.redirect || SECURITY_OAUTH.redirect;
@@ -101,6 +103,8 @@
        * the template together.
        */
       function compile () {
+        $log.debug('oauth.compile');
+
         $http.get(scope.template, {
             //This allows you can get the template again by consuming the
             //$templateCache service directly.
@@ -118,6 +122,8 @@
        * Gets the profile info.
        */
       function initProfile () {
+        $log.debug('oauth.initProfile');
+
         var token = AccessToken.get();
         if (token && token.access_token && SECURITY_OAUTH.profile)
           scope.profile = Profile.get();
@@ -129,6 +135,8 @@
        * Sets the actual visualization status for the widget.
        */
       function initView (token) {
+        $log.debug('oauth.initView');
+
         var token = AccessToken.get();
         // There is not token: without access token it's logged out
         if (!token)             {
@@ -145,10 +153,12 @@
       }
 
       scope.login = function() {
+        $log.debug('oauth.scope.login');
         Endpoint.redirect();
       }
 
       scope.logout = function() {
+        $log.debug('oauth.scope.logout');
         AccessToken.destroy(scope);
         loggedOut();
       }
@@ -158,6 +168,7 @@
        * @description
        */
       function loggedIn(){
+        $log.debug('oauth.loggedIn');
         $rootScope.$broadcast('oauth:success', AccessToken.get());
         scope.show = 'logout';
       }
@@ -167,6 +178,7 @@
        * @description
        */
       function loggedOut () {
+        $log.debug('oauth.loggedOut');
         $rootScope.$broadcast('oauth:logout');
         scope.show = 'login';
       }
@@ -176,6 +188,7 @@
        * @description
        */
       function denied(){
+        $log.debug('oauth.denied');
         scope.show = 'denied';
         $rootScope.$broadcast('oauth:denied');
       }
