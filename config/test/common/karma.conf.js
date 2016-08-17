@@ -50,4 +50,3 @@ Configurator.prototype.files = function(specificFiles) {
 };
 
 module.exports = new Configurator();
-
