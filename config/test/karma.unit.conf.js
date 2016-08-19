@@ -1,6 +1,7 @@
 'use strict';
 
 var settings = require('./common/karma.conf');
+require('phantomjs-polyfill');
 
 module.exports = function(config) {
 

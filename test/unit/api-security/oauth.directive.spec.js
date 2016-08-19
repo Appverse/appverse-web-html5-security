@@ -1,5 +1,7 @@
 /*jshint expr:true */
 
+var pagesPath = '../src/appverse-security';
+
 describe('OAuth Directive: ', function() {
     'use strict';
 
