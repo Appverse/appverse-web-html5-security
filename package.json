@@ -6,6 +6,7 @@
     "url": "https://github.com/Appverse/appverse-web-html5-security"
   },
   "devDependencies": {
+    "bower": "^1.7.9",
     "canonical-path": "0.0.2",
     "chai": "^3.5.0",
     "connect-livereload": "0.5.4",
