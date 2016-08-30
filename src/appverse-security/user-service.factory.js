@@ -12,9 +12,9 @@
      * Handles the user in the app.
      *
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
-     * @requires CacheFactory
+     * @requires avCacheFactory
      */
-    function UserServiceFactory($log, CacheFactory) {
+    function UserServiceFactory($log, avCacheFactory) {
 
         return {
             /**
@@ -26,7 +26,7 @@
              */
             setCurrentUser: function (loggedUser) {
 
-                CacheFactory._browserCache.put('loggedUser', {
+                avCacheFactory._browserCache.put('loggedUser', {
                     username: loggedUser.name,
                     roles: loggedUser.roles,
                     bToken: loggedUser.bToken,
@@ -43,7 +43,7 @@
              * @returns {appverse.security.global:User} The currently logged user
              */
             getCurrentUser: function () {
-                var loggedUser = CacheFactory._browserCache.get('loggedUser');
+                var loggedUser = avCacheFactory._browserCache.get('loggedUser');
 
                 if (loggedUser && loggedUser.isLogged) {
                     return new User(loggedUser.username, loggedUser.roles, loggedUser.bToken, loggedUser.xsrfToken, loggedUser.isLogged);
@@ -55,7 +55,7 @@
              * @description Removes the current user from the app, including cache.
              */
             removeUser: function () {
-                CacheFactory._browserCache.remove('loggedUser');
+                avCacheFactory._browserCache.remove('loggedUser');
             }
         };
     }

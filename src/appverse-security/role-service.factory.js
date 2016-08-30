@@ -11,9 +11,9 @@
      *
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
      * @requires AUTHORIZATION_DATA
-     * @requires CacheFactory
+     * @requires avCacheFactory
      */
-    function RoleServiceFactory($log, AUTHORIZATION_DATA, CacheFactory) {
+    function RoleServiceFactory($log, AUTHORIZATION_DATA, avCacheFactory) {
 
         return {
 
@@ -25,7 +25,7 @@
              * @returns {boolean} True if the role of the usder has admin previleges
              */
             validateRoleAdmin: function () {
-                var roles = CacheFactory._browserCache.get('loggedUser').roles;
+                var roles = avCacheFactory._browserCache.get('loggedUser').roles;
                 $log.debug('roles in session: ' + roles);
 
                 var result;
@@ -53,7 +53,7 @@
              * @returns {boolean} True if the user has that role
              */
             validateRoleInUserOther: function (role) {
-                var user = CacheFactory._browserCache.get('loggedUser');
+                var user = avCacheFactory._browserCache.get('loggedUser');
                 if (user) {
                     return _.contains(role, user.roles);
                 } else {

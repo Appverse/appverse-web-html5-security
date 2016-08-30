@@ -129,18 +129,17 @@
     angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies
         'appverse.configuration', // Common API Module
-        'appverse.utils',
         'ngResource'
     ])
         .config(configModule)
         .run(run);
 
-    function configModule($provide, $httpProvider, ModuleSeekerProvider) {
+    function configModule($provide, $httpProvider, $injector) {
 
-        if (!ModuleSeekerProvider.exists('appverse.cache')) {
+        if (!$injector.has('avCacheFactory')) {
 
-            //appverse.cache module not found. Adding basic CacheFactory.
-            $provide.factory('CacheFactory', function ($cacheFactory) {
+            //appverse.cache module not found. Adding basic avCacheFactory.
+            $provide.factory('avCacheFactory', function ($cacheFactory) {
                 return {
                     _browserCache: $cacheFactory('basicCache')
                 };
@@ -152,17 +151,11 @@
             return {
                 'response': function (response) {
 
-                    // Injected manually because of a circular dependency problem:
-                    // $http -> interceptor -> Oauth_AccessToken -> CacheFactory -> $http
-                    // Circular dependencies appear when app design mixes concerns.
-                    // TODO: Redesign architecture.
-                    var oauthAccessTokenService = $injector.get('Oauth_AccessToken');
-
                     // Retrieves bearer/oauth token from header
                     var tokenInHeader = response.headers('X-XSRF-Cookie');
                     $log.debug('oauthResponseInterceptor X-XSRF-Cookie: ' + tokenInHeader);
                     if (tokenInHeader) {
-                        oauthAccessTokenService.setFromHeader(tokenInHeader);
+                        $injector.get('Oauth_AccessToken').setFromHeader(tokenInHeader);
                     }
                     return response;
                 }
@@ -181,7 +174,7 @@
                 'responseError': function (rejection) {
                     if (rejection.status === 401) {
                         //Redirects them back to main/login page
-                        $location.path('/home');
+                        $location.path('/');
 
                         return $q.reject(rejection);
                     } else {

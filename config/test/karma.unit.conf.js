@@ -1,18 +1,32 @@
 'use strict';
 
-var settings = require('./common/karma.conf');
-
-module.exports = function(config) {
+module.exports = function (config) {
 
     config.set({
 
-        basePath : settings.basePath,
+        basePath: '../../',
 
-        files : settings.filesForUnitTests(),
+        frameworks: ['mocha', 'chai', 'sinon'],
 
-        frameworks: settings.frameworks,
+        files: [
+            'bower_components/angular/angular.js',
+            'bower_components/angular-cookies/angular-cookies.js',
+            'bower_components/angular-resource/angular-resource.js',
+            'bower_components/appverse-web-html5-core/dist/appverse/appverse.js',
+            'bower_components/appverse-web-html5-core/dist/appverse-utils/appverse-utils.js',
 
-        browsers : ['PhantomJS'],
+            'bower_components/angular-cache/dist/angular-cache.js',
+            'bower_components/appverse-web-html5-core/dist/appverse-cache/appverse-cache.js',
+
+            'bower_components/angular-mocks/angular-mocks.js',
+            'src/appverse-*/**/module.js',
+            // The rest
+            'src/appverse-*/**/*.js',
+
+            'test/unit/**/*.js'
+        ],
+
+        browsers: ['PhantomJS'],
 
         reporters: ['progress', 'coverage', 'notify', 'junit'],
 
@@ -24,20 +38,24 @@ module.exports = function(config) {
         },
 
         coverageReporter: {
-          // specify a common output directory
+            // specify a common output directory
             dir: 'reports/coverage/unit',
-              reporters: [
+            reporters: [
                 // reporters not supporting the `file` property
-                { type: 'html'},
-                { type: 'clover'},
+                {
+                    type: 'html'
+            },
+                {
+                    type: 'clover'
+            },
 
             ]
         },
 
         junitReporter: {
-          outputFile: 'reports/junit/unit-test-results.xml',
-          suite: ''
+            outputDir: 'reports/junit',
+            outputFile: 'unit-test-results.xml',
+            useBrowserName: false
         }
     });
-
 };
