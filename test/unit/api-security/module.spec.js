@@ -5,6 +5,29 @@ describe('appverse.security module with appverse.cache: ', function () {
 
     var $httpBackend;
 
+    AppInit.setConfig({
+        environment: {
+            SECURITY_GENERAL: {
+                securityEnabled: true,
+                loginURL: 'http://myserver/rest/login',
+                loginHTTPMethod: 'POST',
+                logoutURL: 'http://myserver/rest/logout',
+                logoutHTTPMethod: 'POST',
+                routes: {
+                    "/admin": ["ADMIN"],
+                    "/customer": ["CUSTOMER"],
+                    "/profile": ["ADMIN", "CUSTOMER"]
+                },
+                routeDeniedRedirect: "/routeDenied",
+                loginRequiredRedirect: "/login",
+                error401Redirect: "/error401"
+            },
+            SECURITY_OAUTH: {
+                scope_template: 'views/oauth_default.html'
+            }
+        }
+    });
+
     beforeEach(module('appverse.cache'));
     beforeEach(module('appverse.security'));
 
@@ -39,26 +62,51 @@ describe('appverse.security module with appverse.cache: ', function () {
         $httpBackend.flush();
     }));
 
-    it('should redirect on error 401', inject(function ($http, $location) {
+    it('should redirect on error 401', inject(function ($http, $location, UserService) {
 
-        $location.path().should.be.equal('');
+        UserService.setCurrentUser({
+            isLogged: true
+        });
 
         $httpBackend.expectGET('/testError').respond(401);
         $http.get('/testError');
         $httpBackend.flush();
 
-        $location.path().should.be.equal('/');
+        $location.path().should.be.equal('/error401');
     }));
 
-    it('should not redirect on other errors', inject(function ($http, $location) {
+    it('should not redirect on other errors', inject(function ($http, $location, UserService) {
 
-        $location.path().should.be.equal('');
+        UserService.setCurrentUser({
+            isLogged: true
+        });
 
         $httpBackend.expectGET('/testError').respond(404);
         $http.get('/testError');
         $httpBackend.flush();
 
         $location.path().should.be.equal('');
+    }));
+
+    it('should redirect when not logged in and route denied', inject(function ($location, UserService, $rootScope) {
+
+        UserService.removeUser();
+
+        $location.path('/admin');
+        $rootScope.$digest();
+        $location.path().should.be.equal('/login');
+    }));
+
+    it('should redirect when route denied', inject(function ($location, UserService, $rootScope) {
+
+        UserService.setCurrentUser({
+            roles: ["ADMIN"],
+            isLogged: true
+        });
+
+        $location.path('/customer');
+        $rootScope.$digest();
+        $location.path().should.be.equal('/routeDenied');
     }));
 });
 

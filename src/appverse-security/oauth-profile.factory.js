@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('Oauth_Profile', OauthProfileFactory);
@@ -13,11 +13,9 @@
      * @requires https://docs.angularjs.org/api/ng/service/$resource $resource
      * @requires SECURITY_OAUTH
      */
-    function OauthProfileFactory(Oauth_RequestWrapper, $resource, SECURITY_OAUTH) {
-        var resource = $resource(SECURITY_OAUTH.profile, {}, {
-            //get: { method: 'JSONP', params: { callback: 'JSON_CALLBACK' } }
-        });
-        return Oauth_RequestWrapper.wrapRequest(resource, ['get']);
+    function OauthProfileFactory(Oauth_RequestWrapper, Restangular) {
+
+        return Oauth_RequestWrapper.wrapRequest(Restangular);
     }
 
 })();
