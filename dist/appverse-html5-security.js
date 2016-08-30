@@ -339,11 +339,11 @@
              * @returns {boolean}  true if is already logged
              */
             isLoggedIn: function () {
-                var user = UserService.getCurrentUser();
-                if (user) {
+                if (UserService.getCurrentUser()) {
                     return true;
+                } else {
+                    return false;
                 }
-                return false;
             },
             /**
              * @ngdoc method
