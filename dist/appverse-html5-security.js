@@ -127,7 +127,7 @@
      * @requires AppREST
      */
     configModule.$inject = ["$provide", "$httpProvider", "$injector"];
-    run.$inject = ["$log"];
+    run.$inject = ["$log", "$rootScope", "$location", "UserService", "SECURITY_GENERAL", "RoleService", "AuthenticationService"];
     angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies
         'appverse.configuration', // Common API Module
@@ -170,18 +170,15 @@
         $httpProvider.interceptors.push('oauthResponseInterceptor');
 
 
-        var logsOutUserOn401 = ['$q', '$location', function ($q, $location) {
+        var logsOutUserOn401 = ['$q', '$location', '$log', 'SECURITY_GENERAL', function ($q, $location, $log, SECURITY_GENERAL) {
 
             return {
                 'responseError': function (rejection) {
-                    if (rejection.status === 401) {
-                        //Redirects them back to main/login page
-                        $location.path('/');
-
-                        return $q.reject(rejection);
-                    } else {
-                        return $q.reject(rejection);
+                    if (rejection.status === 401 && SECURITY_GENERAL.error401Redirect) {
+                        $log.error('Error 401 intercepted. Redirecting...');
+                        $location.path(SECURITY_GENERAL.error401Redirect);
                     }
+                    return $q.reject(rejection);
                 }
             };
 
@@ -191,19 +188,47 @@
         $httpProvider.interceptors.push('logsOutUserOn401');
     }
 
-    function run($log) {
+    function run($log, $rootScope, $location, UserService, SECURITY_GENERAL, RoleService, AuthenticationService) {
 
         $log.debug('appverse.security run');
 
+        $rootScope.$on('$locationChangeStart',
+            function (angularEvent) {
 
+                if ($location.url() === (SECURITY_GENERAL.loginRequiredRedirect || SECURITY_GENERAL.routeDeniedRedirect || SECURITY_GENERAL.error401Redirect)) {
+                    return;
+                }
+
+                if (!RoleService.isRouteAllowed()) {
+
+                    var user = UserService.getCurrentUser();
+
+                    if (user && user.isLogged && SECURITY_GENERAL.routeDeniedRedirect) {
+                        $log.debug('Route is denied. Redirecting...');
+                        angularEvent.preventDefault();
+                        $location.path(SECURITY_GENERAL.routeDeniedRedirect);
+                        return;
+                    }
+
+                    if (SECURITY_GENERAL.loginRequiredRedirect) {
+                        $log.debug('Login required. Redirecting...');
+                        angularEvent.preventDefault();
+                        $location.path(SECURITY_GENERAL.loginRequiredRedirect);
+                        return;
+                    }
+                }
+            });
+
+        $rootScope.UserService = UserService;
+        $rootScope.AuthenticationService = AuthenticationService;
     }
 
 })();
 
-(function() {
+(function () {
     'use strict';
 
-    AuthenticationServiceFactory.$inject = ["$rootScope", "UserService", "Base64", "$http", "$q", "$log", "SECURITY_GENERAL"];
+    AuthenticationServiceFactory.$inject = ["UserService", "Base64", "$http", "$q", "$log", "SECURITY_GENERAL", "$rootScope"];
     angular.module('appverse.security').factory('AuthenticationService', AuthenticationServiceFactory);
 
     /**
@@ -212,7 +237,6 @@
      * @module  appverse.security
      * @description Exposes some useful methods for apps developers.
      *
-     * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
      * @requires UserService
      * @requires Base64
      * @requires https://docs.angularjs.org/api/ng/service/$http $http
@@ -220,7 +244,7 @@
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
      * @requires SECURITY_GENERAL
      */
-    function AuthenticationServiceFactory ($rootScope, UserService, Base64, $http, $q, $log, SECURITY_GENERAL) {
+    function AuthenticationServiceFactory(UserService, Base64, $http, $q, $log, SECURITY_GENERAL, $rootScope) {
 
         return {
 
@@ -233,10 +257,9 @@
              * @return {object}             A promise resolving to the response
              */
             sendLoginRequest: function (credentials) {
-                var deferred = $q.defer();
                 var encoded = Base64.encode(credentials.name + ':' + credentials.password);
 
-                $http({
+                return $http({
                     method: SECURITY_GENERAL.loginHTTPMethod,
                     url: SECURITY_GENERAL.loginURL,
                     headers: {
@@ -245,20 +268,7 @@
                     },
                     timeout: 30000,
                     cache: false
-                })
-                    .success(function (data, status, headers, config) {
-                        var results = [];
-                        results.data = data;
-                        results.headers = headers;
-                        results.status = status;
-                        results.config = config;
-
-                        deferred.resolve(results);
-                    })
-                    .error(function (data, status) {
-                        deferred.reject(data, status);
-                    });
-                return deferred.promise;
+                });
             },
 
             /**
@@ -270,16 +280,17 @@
              */
             sendLogoutRequest: function () {
                 var deferred = $q.defer();
+                var self = this;
 
                 $http({
-                    method: SECURITY_GENERAL.logoutHTTPMethod,
-                    url: SECURITY_GENERAL.logoutURL,
-                    headers: {
-                        'Content-Type': SECURITY_GENERAL.Headers_ContentType
-                    },
-                    timeout: 30000,
-                    cache: false
-                })
+                        method: SECURITY_GENERAL.logoutHTTPMethod,
+                        url: SECURITY_GENERAL.logoutURL,
+                        headers: {
+                            'Content-Type': SECURITY_GENERAL.Headers_ContentType
+                        },
+                        timeout: 30000,
+                        cache: false
+                    })
                     .success(function (data, status, headers, config) {
                         var results = [];
                         results.data = data;
@@ -288,6 +299,8 @@
                         results.config = config;
 
                         deferred.resolve(results);
+
+                        self.logOut();
                     })
                     .error(function (data, status) {
                         deferred.reject(data, status);
@@ -308,10 +321,14 @@
 
              */
             login: function (name, roles, bToken, xsrfToken, isLogged) {
-                //$log.debug(' -- bToken -- : ' + bToken);
-                var user = new User(name, roles, bToken, xsrfToken, isLogged);
-                $log.debug(user.print());
-                UserService.setCurrentUser(user);
+
+                UserService.setCurrentUser({
+                    name: name,
+                    roles: roles,
+                    bToken: bToken,
+                    xsrfToken: xsrfToken,
+                    isLogged: isLogged
+                });
             },
             /**
              * @ngdoc method
@@ -335,14 +352,16 @@
              *
              * @param {User} user The User object to be logged out
              */
-            logOut: function (user) {
-                UserService.removeUser(user);
+            logOut: function () {
+                UserService.removeUser();
+                $rootScope.$emit('$locationChangeStart');
             }
 
         };
     }
 
 })();
+
 (function() {
     'use strict';
 
@@ -701,10 +720,10 @@
 
 })();
 
-(function() {
+(function () {
     'use strict';
 
-    OauthProfileFactory.$inject = ["Oauth_RequestWrapper", "$resource", "SECURITY_OAUTH"];
+    OauthProfileFactory.$inject = ["Oauth_RequestWrapper", "Restangular"];
     angular.module('appverse.security').factory('Oauth_Profile', OauthProfileFactory);
 
     /**
@@ -717,11 +736,9 @@
      * @requires https://docs.angularjs.org/api/ng/service/$resource $resource
      * @requires SECURITY_OAUTH
      */
-    function OauthProfileFactory(Oauth_RequestWrapper, $resource, SECURITY_OAUTH) {
-        var resource = $resource(SECURITY_OAUTH.profile, {}, {
-            //get: { method: 'JSONP', params: { callback: 'JSON_CALLBACK' } }
-        });
-        return Oauth_RequestWrapper.wrapRequest(resource, ['get']);
+    function OauthProfileFactory(Oauth_RequestWrapper, Restangular) {
+
+        return Oauth_RequestWrapper.wrapRequest(Restangular);
     }
 
 })();
@@ -1092,7 +1109,7 @@
 (function () {
     'use strict';
 
-    RoleServiceFactory.$inject = ["$log", "AUTHORIZATION_DATA", "avCacheFactory"];
+    RoleServiceFactory.$inject = ["$log", "AUTHORIZATION_DATA", "avCacheFactory", "UserService", "SECURITY_GENERAL", "$location"];
     angular.module('appverse.security').factory('RoleService', RoleServiceFactory);
 
     /**
@@ -1105,7 +1122,7 @@
      * @requires AUTHORIZATION_DATA
      * @requires avCacheFactory
      */
-    function RoleServiceFactory($log, AUTHORIZATION_DATA, avCacheFactory) {
+    function RoleServiceFactory($log, AUTHORIZATION_DATA, avCacheFactory, UserService, SECURITY_GENERAL, $location) {
 
         return {
 
@@ -1152,6 +1169,34 @@
                     return false;
                 }
 
+            },
+
+            /**
+             * @ngdoc method
+             * @name appverse.security.factory:RoleService#validateRoleInUserOther
+             * @description Check if the passed user has a given role
+             *
+             * @param {string} role The role to be validated
+             * @returns {boolean} True if the user has that role
+             */
+            isRouteAllowed: function () {
+
+                if (!SECURITY_GENERAL.routes) {
+                    return true;
+                }
+
+                var rolesAllowed = SECURITY_GENERAL.routes[$location.path()];
+
+                if (rolesAllowed) {
+                    var user = UserService.getCurrentUser();
+                    if (user) {
+                        return _.intersection(user.roles, rolesAllowed).length > 0;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
             }
         };
     }
@@ -1178,6 +1223,8 @@
     function UserServiceFactory($log, avCacheFactory) {
 
         return {
+            USER_CACHE_NAME: 'loggedUser',
+            _currentUser: null,
             /**
              * @ngdoc method
              * @name UserService#setCurrentUser
@@ -1185,17 +1232,15 @@
              *
              * @param {object} loggedUser The currently logged user
              */
-            setCurrentUser: function (loggedUser) {
+            setCurrentUser: function (user) {
 
-                avCacheFactory._browserCache.put('loggedUser', {
-                    username: loggedUser.name,
-                    roles: loggedUser.roles,
-                    bToken: loggedUser.bToken,
-                    xsrfToken: loggedUser.xsrfToken,
-                    isLogged: loggedUser.isLogged
-                });
+                var newUser = new User(user.name, user.roles, user.bToken, user.xsrfToken, user.isLogged);
 
-                $log.debug('New user has been stored to cache.');
+                avCacheFactory._browserCache.put(this.USER_CACHE_NAME, newUser);
+
+                $log.debug('New user has been stored to browser cache.');
+
+                this._currentUser = newUser;
             },
             /**
              * @ngdoc method
@@ -1204,10 +1249,17 @@
              * @returns {appverse.security.global:User} The currently logged user
              */
             getCurrentUser: function () {
-                var loggedUser = avCacheFactory._browserCache.get('loggedUser');
+                if (this._currentUser) {
+                    return this._currentUser;
+                } else {
+                    var user = avCacheFactory._browserCache.get(this.USER_CACHE_NAME);
 
-                if (loggedUser && loggedUser.isLogged) {
-                    return new User(loggedUser.username, loggedUser.roles, loggedUser.bToken, loggedUser.xsrfToken, loggedUser.isLogged);
+                    if (user && user.isLogged) {
+                        this._currentUser = user;
+                        return user;
+                    } else {
+                        return null;
+                    }
                 }
             },
             /**
@@ -1216,7 +1268,9 @@
              * @description Removes the current user from the app, including cache.
              */
             removeUser: function () {
-                avCacheFactory._browserCache.remove('loggedUser');
+                this._currentUser = null;
+                avCacheFactory._browserCache.remove(this.USER_CACHE_NAME);
+                $log.debug('User has been removed from browser cache.');
             }
         };
     }

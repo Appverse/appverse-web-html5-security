@@ -13,7 +13,7 @@
      * @requires AUTHORIZATION_DATA
      * @requires avCacheFactory
      */
-    function RoleServiceFactory($log, AUTHORIZATION_DATA, avCacheFactory) {
+    function RoleServiceFactory($log, AUTHORIZATION_DATA, avCacheFactory, UserService, SECURITY_GENERAL, $location) {
 
         return {
 
@@ -60,6 +60,34 @@
                     return false;
                 }
 
+            },
+
+            /**
+             * @ngdoc method
+             * @name appverse.security.factory:RoleService#validateRoleInUserOther
+             * @description Check if the passed user has a given role
+             *
+             * @param {string} role The role to be validated
+             * @returns {boolean} True if the user has that role
+             */
+            isRouteAllowed: function () {
+
+                if (!SECURITY_GENERAL.routes) {
+                    return true;
+                }
+
+                var rolesAllowed = SECURITY_GENERAL.routes[$location.path()];
+
+                if (rolesAllowed) {
+                    var user = UserService.getCurrentUser();
+                    if (user) {
+                        return _.intersection(user.roles, rolesAllowed).length > 0;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
             }
         };
     }

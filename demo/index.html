@@ -1,57 +1,65 @@
 <!DOCTYPE html>
 <html>
 
-    <head>
-        <meta charset="UTF-8">
-        <title>Appverse HTML5 Security Demo</title>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <title>Appverse HTML5 Security Demo</title>
 
-    <body data-ng-app="security-demo-app">
-        <h1>APPVERSE HTML5 Security demo</h1>
+    <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css">
+</head>
 
-        <h2>Directive</h2>
-        <oauth ng-cloak id="securityDirective" site="http://localhost:9000" client="e72c43c75adc9665e4d4c13354c41f337d5a2e439d3da1243bb47e39745f435c" redirect="http://localhost:9000" scope="resources" profile="http://localhost:9000/me" storage="cookies">Sign In
-        </oauth>
+<body data-ng-app="security-demo-app">
 
-        <script src="angular/angular.js"></script>
-        <script src="angular-cookies/angular-cookies.js"></script>
-        <!--    <script src="angular-route/angular-route.js"></script>-->
-        <!--    <script src="lodash/dist/lodash.min.js"></script>-->
-        <!--    <script src="restangular/dist/restangular.min.js"></script>-->
-        <script src="angular-resource/angular-resource.js"></script>
-        <script src="angular-touch/angular-touch.js"></script>
+    <div class="container">
 
-        <script src="appverse-web-html5-core/dist/appverse-logging/appverse-logging.min.js"></script>
-        <script src="appverse-web-html5-core/dist/appverse-utils/appverse-utils.min.js"></script>
-        <!--    <script src="appverse-web-html5-core/dist/appverse-rest/appverse-rest.min.js"></script>-->
-        <script src="appverse-web-html5-core/dist/appverse/appverse.min.js"></script>
+        <div class="jumbotron">
+            <h1>Appverse HTML5 Security demo</h1>
+            <p ng-hide="UserService.getCurrentUser()">You are not logged in.</p>
+            <p ng-show="UserService.getCurrentUser()">You are logged in as <b ng-bind="UserService.getCurrentUser().name"></b>.
+                <button type="button" class="btn btn-danger" ng-click="AuthenticationService.sendLogoutRequest()">Logout</button>
+            </p>
+            <a ui-sref="help" class="btn btn-link">Need help?</a>
+        </div>
 
-        <!-- ########## Core modules: autoinjected. Check gruntfile.js ########## -->
-        <!-- injector:js -->
-        <script src="appverse-security/module.js"></script>
-        <script src="appverse-security/authentication-service.factory.js"></script>
-        <script src="appverse-security/oauth-access-token.factory.js"></script>
-        <script src="appverse-security/oauth-endpoint.factory.js"></script>
-        <script src="appverse-security/oauth-profile.factory.js"></script>
-        <script src="appverse-security/oauth-request-wrapper.factory.js"></script>
-        <script src="appverse-security/oauth.directive.js"></script>
-        <script src="appverse-security/role-service.factory.js"></script>
-        <script src="appverse-security/user-service.factory.js"></script>
-        <!-- endinjector -->
+        <ui-view/>
 
-        <script>
-            angular.module('security-demo-app', ['appverse', 'appverse.security', 'appverse.logging', 'ngCookies']).run(function($log) {
-                $log.debug('security-demo-app run');
-            });
-            AppInit.setConfig({
-                environment: {
-                    "SECURITY_GENERAL": {
-                        "securityEnabled": true
-                    }
-                }
-            });
-        </script>
+    </div>
 
-    </body>
+    <script src="angular/angular.min.js"></script>
+    <script src="angular-cookies/angular-cookies.min.js"></script>
+    <script src="angular-resource/angular-resource.min.js"></script>
+    <script src="angular-mocks/angular-mocks.js"></script>
+    <script src="lodash/lodash.min.js"></script>
+
+    <script src="appverse-web-html5-core/dist/appverse-logging/appverse-logging.min.js"></script>
+    <script src="appverse-web-html5-core/dist/appverse-utils/appverse-utils.min.js"></script>
+    <script src="appverse-web-html5-core/dist/appverse/appverse.min.js"></script>
+
+    <script src="angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="appverse-web-html5-core/dist/appverse-router/appverse-router.min.js"></script>
+
+    <script src="angular-cache/dist/angular-cache.min.js"></script>
+    <script src="appverse-web-html5-core/dist/appverse-cache/appverse-cache.min.js"></script>
+
+    <script src="restangular/dist/restangular.min.js"></script>
+    <script src="appverse-web-html5-core/dist/appverse-rest/appverse-rest.min.js"></script>
+
+    <!-- ########## Core modules: autoinjected. Check gruntfile.js ########## -->
+    <!-- injector:js -->
+    <script src="appverse-security/module.js"></script>
+    <script src="appverse-security/authentication-service.factory.js"></script>
+    <script src="appverse-security/oauth-access-token.factory.js"></script>
+    <script src="appverse-security/oauth-endpoint.factory.js"></script>
+    <script src="appverse-security/oauth-profile.factory.js"></script>
+    <script src="appverse-security/oauth-request-wrapper.factory.js"></script>
+    <script src="appverse-security/oauth.directive.js"></script>
+    <script src="appverse-security/role-service.factory.js"></script>
+    <script src="appverse-security/user-service.factory.js"></script>
+    <!-- endinjector -->
+
+    <script src="scripts/app.js"></script>
+    <script src="scripts/states.js"></script>
+    <script src="scripts/controllers.js"></script>
+</body>
 
 </html>

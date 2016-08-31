@@ -168,18 +168,15 @@
         $httpProvider.interceptors.push('oauthResponseInterceptor');
 
 
-        var logsOutUserOn401 = ['$q', '$location', function ($q, $location) {
+        var logsOutUserOn401 = ['$q', '$location', '$log', 'SECURITY_GENERAL', function ($q, $location, $log, SECURITY_GENERAL) {
 
             return {
                 'responseError': function (rejection) {
-                    if (rejection.status === 401) {
-                        //Redirects them back to main/login page
-                        $location.path('/');
-
-                        return $q.reject(rejection);
-                    } else {
-                        return $q.reject(rejection);
+                    if (rejection.status === 401 && SECURITY_GENERAL.error401Redirect) {
+                        $log.error('Error 401 intercepted. Redirecting...');
+                        $location.path(SECURITY_GENERAL.error401Redirect);
                     }
+                    return $q.reject(rejection);
                 }
             };
 
@@ -189,11 +186,39 @@
         $httpProvider.interceptors.push('logsOutUserOn401');
     }
 
-    function run($log) {
+    function run($log, $rootScope, $location, UserService, SECURITY_GENERAL, RoleService, AuthenticationService) {
 
         $log.debug('appverse.security run');
 
+        $rootScope.$on('$locationChangeStart',
+            function (angularEvent) {
 
+                if ($location.url() === (SECURITY_GENERAL.loginRequiredRedirect || SECURITY_GENERAL.routeDeniedRedirect || SECURITY_GENERAL.error401Redirect)) {
+                    return;
+                }
+
+                if (!RoleService.isRouteAllowed()) {
+
+                    var user = UserService.getCurrentUser();
+
+                    if (user && user.isLogged && SECURITY_GENERAL.routeDeniedRedirect) {
+                        $log.debug('Route is denied. Redirecting...');
+                        angularEvent.preventDefault();
+                        $location.path(SECURITY_GENERAL.routeDeniedRedirect);
+                        return;
+                    }
+
+                    if (SECURITY_GENERAL.loginRequiredRedirect) {
+                        $log.debug('Login required. Redirecting...');
+                        angularEvent.preventDefault();
+                        $location.path(SECURITY_GENERAL.loginRequiredRedirect);
+                        return;
+                    }
+                }
+            });
+
+        $rootScope.UserService = UserService;
+        $rootScope.AuthenticationService = AuthenticationService;
     }
 
 })();
