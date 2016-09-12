@@ -104,19 +104,19 @@ module.exports = function (grunt) {
             },
             coverage: '<%= configPaths.coverage %>/**',
             server: '.tmp',
-            doc: 'doc/' + bowerFile.version
+            doc: 'doc'
         },
 
         bump: {
             options: {
-                files: ['package.json', 'bower.json'],
+                files: ['package.json'],
                 updateConfigs: [],
                 commit: true,
-                commitMessage: 'Release v%VERSION%',
-                commitFiles: ['package.json', 'bower.json', 'dist'],
+                commitMessage: 'v%VERSION%',
+                commitFiles: ['package.json', 'dist'],
                 createTag: true,
                 tagName: 'v%VERSION%',
-                tagMessage: 'Version %VERSION%',
+                tagMessage: 'v%VERSION%',
                 push: true,
                 pushTo: 'origin',
                 gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'

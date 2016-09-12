@@ -2,7 +2,7 @@
     "boss": true,
     "node": true,
     "strict": true,
-    "maxlen": 120,
+    "maxlen": 140,
     "newcap": false,
     "undef": false,
     "unused": true,
