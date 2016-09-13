@@ -12,11 +12,13 @@
      * Handles the user in the app.
      *
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
-     * @requires CacheFactory
+     * @requires avCacheFactory
      */
-    function UserServiceFactory($log, CacheFactory) {
+    function UserServiceFactory($log, avCacheFactory) {
 
         return {
+            USER_CACHE_NAME: 'loggedUser',
+            _currentUser: null,
             /**
              * @ngdoc method
              * @name UserService#setCurrentUser
@@ -24,17 +26,15 @@
              *
              * @param {object} loggedUser The currently logged user
              */
-            setCurrentUser: function (loggedUser) {
+            setCurrentUser: function (user) {
 
-                CacheFactory._browserCache.put('loggedUser', {
-                    username: loggedUser.name,
-                    roles: loggedUser.roles,
-                    bToken: loggedUser.bToken,
-                    xsrfToken: loggedUser.xsrfToken,
-                    isLogged: loggedUser.isLogged
-                });
+                var newUser = new User(user.name, user.roles, user.bToken, user.xsrfToken, user.isLogged);
 
-                $log.debug('New user has been stored to cache.');
+                avCacheFactory._browserCache.put(this.USER_CACHE_NAME, newUser);
+
+                $log.debug('New user has been stored to browser cache.');
+
+                this._currentUser = newUser;
             },
             /**
              * @ngdoc method
@@ -43,10 +43,17 @@
              * @returns {appverse.security.global:User} The currently logged user
              */
             getCurrentUser: function () {
-                var loggedUser = CacheFactory._browserCache.get('loggedUser');
+                if (this._currentUser) {
+                    return this._currentUser;
+                } else {
+                    var user = avCacheFactory._browserCache.get(this.USER_CACHE_NAME);
 
-                if (loggedUser && loggedUser.isLogged) {
-                    return new User(loggedUser.username, loggedUser.roles, loggedUser.bToken, loggedUser.xsrfToken, loggedUser.isLogged);
+                    if (user && user.isLogged) {
+                        this._currentUser = user;
+                        return user;
+                    } else {
+                        return null;
+                    }
                 }
             },
             /**
@@ -55,7 +62,9 @@
              * @description Removes the current user from the app, including cache.
              */
             removeUser: function () {
-                CacheFactory._browserCache.remove('loggedUser');
+                this._currentUser = null;
+                avCacheFactory._browserCache.remove(this.USER_CACHE_NAME);
+                $log.debug('User has been removed from browser cache.');
             }
         };
     }

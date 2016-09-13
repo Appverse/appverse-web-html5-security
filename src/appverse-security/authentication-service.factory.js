@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('appverse.security').factory('AuthenticationService', AuthenticationServiceFactory);
@@ -9,7 +9,6 @@
      * @module  appverse.security
      * @description Exposes some useful methods for apps developers.
      *
-     * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
      * @requires UserService
      * @requires Base64
      * @requires https://docs.angularjs.org/api/ng/service/$http $http
@@ -17,7 +16,7 @@
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
      * @requires SECURITY_GENERAL
      */
-    function AuthenticationServiceFactory ($rootScope, UserService, Base64, $http, $q, $log, SECURITY_GENERAL) {
+    function AuthenticationServiceFactory(UserService, Base64, $http, $q, $log, SECURITY_GENERAL, $rootScope) {
 
         return {
 
@@ -30,10 +29,9 @@
              * @return {object}             A promise resolving to the response
              */
             sendLoginRequest: function (credentials) {
-                var deferred = $q.defer();
                 var encoded = Base64.encode(credentials.name + ':' + credentials.password);
 
-                $http({
+                return $http({
                     method: SECURITY_GENERAL.loginHTTPMethod,
                     url: SECURITY_GENERAL.loginURL,
                     headers: {
@@ -42,20 +40,7 @@
                     },
                     timeout: 30000,
                     cache: false
-                })
-                    .success(function (data, status, headers, config) {
-                        var results = [];
-                        results.data = data;
-                        results.headers = headers;
-                        results.status = status;
-                        results.config = config;
-
-                        deferred.resolve(results);
-                    })
-                    .error(function (data, status) {
-                        deferred.reject(data, status);
-                    });
-                return deferred.promise;
+                });
             },
 
             /**
@@ -67,16 +52,17 @@
              */
             sendLogoutRequest: function () {
                 var deferred = $q.defer();
+                var self = this;
 
                 $http({
-                    method: SECURITY_GENERAL.logoutHTTPMethod,
-                    url: SECURITY_GENERAL.logoutURL,
-                    headers: {
-                        'Content-Type': SECURITY_GENERAL.Headers_ContentType
-                    },
-                    timeout: 30000,
-                    cache: false
-                })
+                        method: SECURITY_GENERAL.logoutHTTPMethod,
+                        url: SECURITY_GENERAL.logoutURL,
+                        headers: {
+                            'Content-Type': SECURITY_GENERAL.Headers_ContentType
+                        },
+                        timeout: 30000,
+                        cache: false
+                    })
                     .success(function (data, status, headers, config) {
                         var results = [];
                         results.data = data;
@@ -85,6 +71,8 @@
                         results.config = config;
 
                         deferred.resolve(results);
+
+                        self.logOut();
                     })
                     .error(function (data, status) {
                         deferred.reject(data, status);
@@ -105,10 +93,14 @@
 
              */
             login: function (name, roles, bToken, xsrfToken, isLogged) {
-                //$log.debug(' -- bToken -- : ' + bToken);
-                var user = new User(name, roles, bToken, xsrfToken, isLogged);
-                $log.debug(user.print());
-                UserService.setCurrentUser(user);
+
+                UserService.setCurrentUser({
+                    name: name,
+                    roles: roles,
+                    bToken: bToken,
+                    xsrfToken: xsrfToken,
+                    isLogged: isLogged
+                });
             },
             /**
              * @ngdoc method
@@ -132,8 +124,9 @@
              *
              * @param {User} user The User object to be logged out
              */
-            logOut: function (user) {
-                UserService.removeUser(user);
+            logOut: function () {
+                UserService.removeUser();
+                $rootScope.$emit('$locationChangeStart');
             }
 
         };

@@ -1,30 +1,33 @@
 'use strict';
 
 var
-autoloadGruntTasks = require('load-grunt-tasks'),
-calculateTimeSpent = require('time-grunt'),
-connectLiveReload  = require('connect-livereload'),
-bowerFile          = require('./bower.json'),
-LIVERELOAD_PORT    = 35729,
-liveReloadSnippet  = connectLiveReload({port: LIVERELOAD_PORT});
+    autoloadGruntTasks = require('load-grunt-tasks'),
+    calculateTimeSpent = require('time-grunt'),
+    connectLiveReload = require('connect-livereload'),
+    bowerFile = require('./bower.json'),
+    serveStatic = require('serve-static'),
+    LIVERELOAD_PORT = 35729,
+    liveReloadSnippet = connectLiveReload({
+        port: LIVERELOAD_PORT
+    });
+
 
 var
-configPaths = {
-    src: bowerFile.appPath || 'src',
-    bowerComponents : bowerFile.directory || 'bower_components',
-    demo : 'demo',
-    dist: 'dist',
-    doc: 'doc',
-    coverage: 'reports/coverage',
-    testsConfig : 'config/test'
-},
+    configPaths = {
+        src: bowerFile.appPath || 'src',
+        bowerComponents: bowerFile.directory || 'bower_components',
+        demo: 'demo',
+        dist: 'dist',
+        doc: 'doc',
+        coverage: 'reports/coverage',
+        testsConfig: 'config/test'
+    },
 
-// Define files to load in the demo, ordering and the way they are
-// concatenated for distribution
-files = {
-    '<%= configPaths.dist %>/appverse-security/appverse-security.js':
-    moduleFilesToConcat('<%= configPaths.src %>/appverse-security')
-};
+    // Define files to load in the demo, ordering and the way they are
+    // concatenated for distribution
+    files = {
+        '<%= configPaths.dist %>/appverse-security/appverse-security.js': moduleFilesToConcat('<%= configPaths.src %>/appverse-security')
+    };
 
 module.exports = function (grunt) {
     autoloadGruntTasks(grunt);
@@ -38,7 +41,7 @@ module.exports = function (grunt) {
 
         maven: {
             options: {
-                goal:'install',
+                goal: 'install',
                 groupId: 'org.appverse.web.framework.modules.frontend.html5',
                 releaseRepository: 'url'
 
@@ -47,31 +50,43 @@ module.exports = function (grunt) {
                 options: {
                     classifier: 'sources'
                 },
-                files: [{src: ['<%= configPaths.app %>/**','<%= configPaths.app %>/!bower_components/**'], dest: ''}]
+                files: [{
+                    src: ['<%= configPaths.app %>/**', '<%= configPaths.app %>/!bower_components/**'],
+                    dest: ''
+                }]
             },
             'install-min': {
                 options: {
                     classifier: 'min'
                 },
-                files: [{src: ['<%= configPaths.dist %>/**'], dest: ''}]
+                files: [{
+                    src: ['<%= configPaths.dist %>/**'],
+                    dest: ''
+                }]
             },
             'deploy-src': {
                 options: {
-                    goal:'deploy',
+                    goal: 'deploy',
                     url: '<%= releaseRepository %>',
                     repositoryId: 'my-nexus',
                     classifier: 'sources'
                 },
-                files: [{src: ['<%= configPaths.app %>/**','<%= configPaths.app %>/!bower_components/**'], dest: ''}]
+                files: [{
+                    src: ['<%= configPaths.app %>/**', '<%= configPaths.app %>/!bower_components/**'],
+                    dest: ''
+                }]
             },
             'deploy-min': {
                 options: {
-                    goal:'deploy',
+                    goal: 'deploy',
                     url: '<%= releaseRepository %>',
                     repositoryId: 'my-nexus',
                     classifier: 'min'
                 },
-                files: [{src: ['<%= configPaths.dist %>/**'], dest: ''}]
+                files: [{
+                    src: ['<%= configPaths.dist %>/**'],
+                    dest: ''
+                }]
             }
         },
 
@@ -87,24 +102,24 @@ module.exports = function (grunt) {
                     ]
                 }]
             },
-            coverage : '<%= configPaths.coverage %>/**',
+            coverage: '<%= configPaths.coverage %>/**',
             server: '.tmp',
-            doc: 'doc/' + bowerFile.version
+            doc: 'doc'
         },
 
         bump: {
             options: {
-              files: ['package.json', 'bower.json'],
-              updateConfigs: [],
-              commit: true,
-              commitMessage: 'Release v%VERSION%',
-              commitFiles: ['package.json','bower.json','dist'],
-              createTag: true,
-              tagName: 'v%VERSION%',
-              tagMessage: 'Version %VERSION%',
-              push: true,
-              pushTo: 'origin',
-              gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
+                files: ['package.json'],
+                updateConfigs: [],
+                commit: true,
+                commitMessage: 'v%VERSION%',
+                commitFiles: ['package.json', 'dist'],
+                createTag: true,
+                tagName: 'v%VERSION%',
+                tagMessage: 'v%VERSION%',
+                push: true,
+                pushTo: 'origin',
+                gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
             }
         },
 
@@ -128,7 +143,7 @@ module.exports = function (grunt) {
                             mountFolder(connect, configPaths.demo),
                         ];
                     },
-                    open : true
+                    open: true
                 }
             },
 
@@ -136,11 +151,13 @@ module.exports = function (grunt) {
             e2e: {
                 options: {
                     port: 9090,
-                     middleware: function (connect) {
+                    middleware: function (connect) {
                         return [
                             mountFolder(connect, configPaths.dist),
                             mountFolder(connect, configPaths.bowerComponents),
-                            mountFolder(connect, configPaths.demo,{index: 'index-dist.html'}),
+                            mountFolder(connect, configPaths.demo, {
+                                index: 'index-dist.html'
+                            }),
                         ];
                     }
                 }
@@ -149,15 +166,17 @@ module.exports = function (grunt) {
             demoDist: {
                 options: {
                     port: 9091,
-                     middleware: function (connect) {
+                    middleware: function (connect) {
                         return [
                             mountFolder(connect, configPaths.dist),
                             mountFolder(connect, configPaths.bowerComponents),
-                            mountFolder(connect, configPaths.demo,{index: 'index-dist.html'}),
+                            mountFolder(connect, configPaths.demo, {
+                                index: 'index-dist.html'
+                            }),
                         ];
                     },
-                    open : true,
-                    keepalive : true
+                    open: true,
+                    keepalive: true
                 }
             },
         },
@@ -185,7 +204,7 @@ module.exports = function (grunt) {
                 transform: function (path) {
                     // Demo server directly mounts src folder so the reference to src is not required
                     path = path.replace('/src/', '');
-                    return '<script src="'+ path +'"></script>';
+                    return '<script src="' + path + '"></script>';
                 }
             },
             demoScripts: {
@@ -203,7 +222,7 @@ module.exports = function (grunt) {
                 singleRun: true
             },
             unitAutoWatch: {
-                configFile: '<%= configPaths.testsConfig %>/karma.unit.watch.conf.js',
+                configFile: '<%= configPaths.testsConfig %>/karma.unit.conf.js',
                 autoWatch: true
             }
         },
@@ -228,15 +247,15 @@ module.exports = function (grunt) {
         // ng-annotate tries to make the code safe for minification automatically
         // by using the Angular long form for dependency injection.
         ngAnnotate: {
-          dist: {
-            files: [{
-              expand: true,
-              cwd: '<%= configPaths.dist %>',
-              src: ['**/*.js', '!oldieshim.js'],
-              dest: '<%= configPaths.dist %>',
-              extDot : 'last'
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= configPaths.dist %>',
+                    src: ['**/*.js', '!oldieshim.js'],
+                    dest: '<%= configPaths.dist %>',
+                    extDot: 'last'
             }]
-          }
+            }
         },
 
         // Uglifies already concatenated files
@@ -247,12 +266,12 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: [{
-                      expand: true,     // Enable dynamic expansion.
-                      cwd: '<%= configPaths.dist %>',      // Src matches are relative to this path.
-                      src: ['**/*.js'], // Actual pattern(s) to match.
-                      dest: '<%= configPaths.dist %>',   // Destination path prefix.
-                      ext: '.min.js',   // Dest filepaths will have this extension.
-                      extDot: 'last'   // Extensions in filenames begin after the last dot
+                        expand: true, // Enable dynamic expansion.
+                        cwd: '<%= configPaths.dist %>', // Src matches are relative to this path.
+                        src: ['**/*.js'], // Actual pattern(s) to match.
+                        dest: '<%= configPaths.dist %>', // Destination path prefix.
+                        ext: '.min.js', // Dest filepaths will have this extension.
+                        extDot: 'last' // Extensions in filenames begin after the last dot
                     }
                 ]
             }
@@ -290,16 +309,13 @@ module.exports = function (grunt) {
     });
 
     // ------ Dist task. Builds the project -----
-
     grunt.registerTask('default', [
         'dist'
     ]);
 
     grunt.registerTask('dist', [
         'jshint',
-        'unit',
-        'dist:make',
-        'test:e2e'
+        'dist:make'
     ]);
 
     grunt.registerTask('dist:make', [
@@ -310,7 +326,6 @@ module.exports = function (grunt) {
     ]);
 
     // ------ Demo tasks. Starts a webserver with a demo app -----
-
     grunt.registerTask('demo', [
         'injector:demoScripts',
         'connect:livereload',
@@ -323,44 +338,19 @@ module.exports = function (grunt) {
     ]);
 
     // ------ Dev tasks. To be run continously while developing -----
-
     grunt.registerTask('dev', [
-        // For now, only execute unit tests when a file changes?
-        // midway and e2e are slow and do not give innmedate
-        // feedback after a change
-        'test:unit:watch'
+        'clean:coverage',
+        'karma:unitAutoWatch'
     ]);
-
 
     // ------ Tests tasks -----
-
     grunt.registerTask('test', [
-        'test:all'
-    ]);
-
-    grunt.registerTask('test:all', [
         'clean:coverage',
         'karma:unit'
     ]);
 
-    grunt.registerTask('unit', [
-        'test:unit:once'
-    ]);
-
-    grunt.registerTask('e2e', [
+    grunt.registerTask('test:e2e', [
         'dist:make',
-        'test:e2e'
-    ]);
-
-    grunt.registerTask('test:unit:watch', [
-        'karma:unitAutoWatch'
-    ]);
-
-    grunt.registerTask('test:unit:once', [
-        'karma:unit'
-    ]);
-
-    grunt.registerTask('test:e2e',  [
         'exec:webdriver_update',
         'connect:e2e',
         'protractor_webdriver',
@@ -397,8 +387,8 @@ module.exports = function (grunt) {
 
 /*---------------------------------------- HELPER METHODS -------------------------------------*/
 
-function mountFolder (connect, dir, options) {
-    return connect.static(require('path').resolve(dir), options);
+function mountFolder(connect, dir, options) {
+    return serveStatic(require('path').resolve(dir), options);
 }
 
 /**
@@ -409,9 +399,9 @@ function mountFolder (connect, dir, options) {
  */
 function getAllFilesForDemo(filesObject) {
     var filesList = [];
-    for( var key in filesObject ) {
+    for (var key in filesObject) {
         if (filesObject.hasOwnProperty(key)) {
-           filesList = filesList.concat(filesObject[key]);
+            filesList = filesList.concat(filesObject[key]);
         }
     }
     return filesList;
@@ -428,7 +418,7 @@ function getAllFilesForDemo(filesObject) {
 function moduleFilesToConcat(moduleFolderPath, filesAfterModule) {
 
     //Remove trailing slash
-    moduleFolderPath =  moduleFolderPath.replace(/\/+$/, '');
+    moduleFolderPath = moduleFolderPath.replace(/\/+$/, '');
 
     // Files using the same module are concatenated in the correct order:
     // · 1st, module.js files are loaded as these are the ones that create the module
@@ -443,6 +433,6 @@ function moduleFilesToConcat(moduleFolderPath, filesAfterModule) {
 
     return files.concat([
         moduleFolderPath + '/**/*.provider.js',
-        moduleFolderPath +'/**/*.js'
+        moduleFolderPath + '/**/*.js'
     ]);
 }

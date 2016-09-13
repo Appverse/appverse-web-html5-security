@@ -126,21 +126,22 @@
      * @requires AppUtils
      * @requires AppREST
      */
+    configModule.$inject = ["$provide", "$httpProvider", "$injector"];
+    run.$inject = ["$log", "$rootScope", "$location", "UserService", "SECURITY_GENERAL", "RoleService", "AuthenticationService"];
     angular.module('appverse.security', [
         'ngCookies', // Angular support for cookies
         'appverse.configuration', // Common API Module
-        'appverse.utils',
         'ngResource'
     ])
         .config(configModule)
         .run(run);
 
-    function configModule($provide, $httpProvider, ModuleSeekerProvider) {
+    function configModule($provide, $httpProvider, $injector) {
 
-        if (!ModuleSeekerProvider.exists('appverse.cache')) {
+        if (!$injector.has('avCacheFactory')) {
 
-            //appverse.cache module not found. Adding basic CacheFactory.
-            $provide.factory('CacheFactory', ["$cacheFactory", function ($cacheFactory) {
+            //appverse.cache module not found. Adding basic avCacheFactory.
+            $provide.factory('avCacheFactory', ["$cacheFactory", function ($cacheFactory) {
                 return {
                     _browserCache: $cacheFactory('basicCache')
                 };
@@ -152,17 +153,11 @@
             return {
                 'response': function (response) {
 
-                    // Injected manually because of a circular dependency problem:
-                    // $http -> interceptor -> Oauth_AccessToken -> CacheFactory -> $http
-                    // Circular dependencies appear when app design mixes concerns.
-                    // TODO: Redesign architecture.
-                    var oauthAccessTokenService = $injector.get('Oauth_AccessToken');
-
                     // Retrieves bearer/oauth token from header
                     var tokenInHeader = response.headers('X-XSRF-Cookie');
-                    $log.debug('X-XSRF-Cookie: ' + tokenInHeader);
+                    $log.debug('oauthResponseInterceptor X-XSRF-Cookie: ' + tokenInHeader);
                     if (tokenInHeader) {
-                        oauthAccessTokenService.setFromHeader(tokenInHeader);
+                        $injector.get('Oauth_AccessToken').setFromHeader(tokenInHeader);
                     }
                     return response;
                 }
@@ -175,18 +170,15 @@
         $httpProvider.interceptors.push('oauthResponseInterceptor');
 
 
-        var logsOutUserOn401 = ['$q', '$location', function ($q, $location) {
+        var logsOutUserOn401 = ['$q', '$location', '$log', 'SECURITY_GENERAL', function ($q, $location, $log, SECURITY_GENERAL) {
 
             return {
                 'responseError': function (rejection) {
-                    if (rejection.status === 401) {
-                        //Redirects them back to main/login page
-                        $location.path('/home');
-
-                        return $q.reject(rejection);
-                    } else {
-                        return $q.reject(rejection);
+                    if (rejection.status === 401 && SECURITY_GENERAL.error401Redirect) {
+                        $log.error('Error 401 intercepted. Redirecting...');
+                        $location.path(SECURITY_GENERAL.error401Redirect);
                     }
+                    return $q.reject(rejection);
                 }
             };
 
@@ -195,21 +187,48 @@
         $provide.factory('logsOutUserOn401', logsOutUserOn401);
         $httpProvider.interceptors.push('logsOutUserOn401');
     }
-    configModule.$inject = ["$provide", "$httpProvider", "ModuleSeekerProvider"];
 
-    function run($log) {
+    function run($log, $rootScope, $location, UserService, SECURITY_GENERAL, RoleService, AuthenticationService) {
 
         $log.debug('appverse.security run');
 
+        $rootScope.$on('$locationChangeStart',
+            function (angularEvent) {
 
+                if ($location.url() === (SECURITY_GENERAL.loginRequiredRedirect || SECURITY_GENERAL.routeDeniedRedirect || SECURITY_GENERAL.error401Redirect)) {
+                    return;
+                }
+
+                if (!RoleService.isRouteAllowed()) {
+
+                    var user = UserService.getCurrentUser();
+
+                    if (user && user.isLogged && SECURITY_GENERAL.routeDeniedRedirect) {
+                        $log.debug('Route is denied. Redirecting...');
+                        angularEvent.preventDefault();
+                        $location.path(SECURITY_GENERAL.routeDeniedRedirect);
+                        return;
+                    }
+
+                    if (SECURITY_GENERAL.loginRequiredRedirect) {
+                        $log.debug('Login required. Redirecting...');
+                        angularEvent.preventDefault();
+                        $location.path(SECURITY_GENERAL.loginRequiredRedirect);
+                        return;
+                    }
+                }
+            });
+
+        $rootScope.UserService = UserService;
+        $rootScope.AuthenticationService = AuthenticationService;
     }
-    run.$inject = ["$log"];
 
 })();
 
-(function() {
+(function () {
     'use strict';
 
+    AuthenticationServiceFactory.$inject = ["UserService", "Base64", "$http", "$q", "$log", "SECURITY_GENERAL", "$rootScope"];
     angular.module('appverse.security').factory('AuthenticationService', AuthenticationServiceFactory);
 
     /**
@@ -218,7 +237,6 @@
      * @module  appverse.security
      * @description Exposes some useful methods for apps developers.
      *
-     * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
      * @requires UserService
      * @requires Base64
      * @requires https://docs.angularjs.org/api/ng/service/$http $http
@@ -226,7 +244,7 @@
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
      * @requires SECURITY_GENERAL
      */
-    function AuthenticationServiceFactory ($rootScope, UserService, Base64, $http, $q, $log, SECURITY_GENERAL) {
+    function AuthenticationServiceFactory(UserService, Base64, $http, $q, $log, SECURITY_GENERAL, $rootScope) {
 
         return {
 
@@ -239,10 +257,9 @@
              * @return {object}             A promise resolving to the response
              */
             sendLoginRequest: function (credentials) {
-                var deferred = $q.defer();
                 var encoded = Base64.encode(credentials.name + ':' + credentials.password);
 
-                $http({
+                return $http({
                     method: SECURITY_GENERAL.loginHTTPMethod,
                     url: SECURITY_GENERAL.loginURL,
                     headers: {
@@ -251,20 +268,7 @@
                     },
                     timeout: 30000,
                     cache: false
-                })
-                    .success(function (data, status, headers, config) {
-                        var results = [];
-                        results.data = data;
-                        results.headers = headers;
-                        results.status = status;
-                        results.config = config;
-
-                        deferred.resolve(results);
-                    })
-                    .error(function (data, status) {
-                        deferred.reject(data, status);
-                    });
-                return deferred.promise;
+                });
             },
 
             /**
@@ -276,16 +280,17 @@
              */
             sendLogoutRequest: function () {
                 var deferred = $q.defer();
+                var self = this;
 
                 $http({
-                    method: SECURITY_GENERAL.logoutHTTPMethod,
-                    url: SECURITY_GENERAL.logoutURL,
-                    headers: {
-                        'Content-Type': SECURITY_GENERAL.Headers_ContentType
-                    },
-                    timeout: 30000,
-                    cache: false
-                })
+                        method: SECURITY_GENERAL.logoutHTTPMethod,
+                        url: SECURITY_GENERAL.logoutURL,
+                        headers: {
+                            'Content-Type': SECURITY_GENERAL.Headers_ContentType
+                        },
+                        timeout: 30000,
+                        cache: false
+                    })
                     .success(function (data, status, headers, config) {
                         var results = [];
                         results.data = data;
@@ -294,6 +299,8 @@
                         results.config = config;
 
                         deferred.resolve(results);
+
+                        self.logOut();
                     })
                     .error(function (data, status) {
                         deferred.reject(data, status);
@@ -314,10 +321,14 @@
 
              */
             login: function (name, roles, bToken, xsrfToken, isLogged) {
-                //$log.debug(' -- bToken -- : ' + bToken);
-                var user = new User(name, roles, bToken, xsrfToken, isLogged);
-                $log.debug(user.print());
-                UserService.setCurrentUser(user);
+
+                UserService.setCurrentUser({
+                    name: name,
+                    roles: roles,
+                    bToken: bToken,
+                    xsrfToken: xsrfToken,
+                    isLogged: isLogged
+                });
             },
             /**
              * @ngdoc method
@@ -341,32 +352,32 @@
              *
              * @param {User} user The User object to be logged out
              */
-            logOut: function (user) {
-                UserService.removeUser(user);
+            logOut: function () {
+                UserService.removeUser();
+                $rootScope.$emit('$locationChangeStart');
             }
 
         };
     }
-    AuthenticationServiceFactory.$inject = ["$rootScope", "UserService", "Base64", "$http", "$q", "$log", "SECURITY_GENERAL"];
 
 })();
-(function () {
+
+(function() {
     'use strict';
 
+    OauthAccessTokenFactory.$inject = ["$location", "$cookies", "UserService", "$log"];
     angular.module('appverse.security').factory('Oauth_AccessToken', OauthAccessTokenFactory);
 
     /**
      * @ngdoc service
-     * @name Oauth_AccessToken
-     * @module  appverse.security
+     * @name appverse.security.factory:Oauth_AccessToken
+     * @requires $location
+     * @requires $cookies
      * @description
      * OAuth access token service.
      * Management of the access token.
-     *
-     * @requires https://docs.angularjs.org/api/ng/service/$location $location
-     * @requires https://docs.angularjs.org/api/ng/service/$cookie $cookies
      */
-    function OauthAccessTokenFactory($location, $cookies, UserService) {
+    function OauthAccessTokenFactory($location, $cookies, UserService, $log) {
 
         var factory = {};
         var token = null;
@@ -375,22 +386,24 @@
 
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#get
+         * @name appverse.security.factory:Oauth_AccessToken#get
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Returns the access token.
          * @returns {object} The user token from the oauth server
          */
-        factory.get = function () {
+        factory.get = function() {
             getTokenFromCache();
             return token;
         };
 
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#getXSRF
+         * @name appverse.security.factory:Oauth_AccessToken#getXSRF
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Returns the XSRF token to be input in each request header.
          * @returns {object} The xsrf token from the oauth server in the current session
          */
-        factory.getXSRF = function () {
+        factory.getXSRF = function() {
             getXSRFTokenFromCache();
             return xsrfToken;
         };
@@ -398,15 +411,15 @@
 
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#set
+         * @name appverse.security.factory:Oauth_AccessToken#set
+         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @param {object} scope The current scope
          * @description
          * Sets and returns the access token taking it from the fragment URI or eventually
          * from the cookies. Use `AccessToken.init()` to load (at boot time) the access token.
          * @returns {object} The user token from the oauth server
-         *
-         * @param {object} scope The current scope
          */
-        factory.set = function (scope) {
+        factory.set = function(scope) {
             // take the token from the query string and eventually save it in the cookies
             setTokenFromString(scope);
             // take the from the cookies
@@ -415,7 +428,7 @@
         };
 
 
-        factory.setFromHeader = function (token) {
+        factory.setFromHeader = function(token) {
             setTokenInCurrentUser(token);
             return token;
         };
@@ -423,13 +436,13 @@
 
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#destroy
-         * @description Delete the access token and remove the cookies.
-         *
+         * @name appverse.security.factory:Oauth_AccessToken#destroy
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @param {object} scope The current scope
+         * @description Delete the access token and remove the cookies.
          * @returns {object} The user token from the oauth server
          */
-        factory.destroy = function (scope) {
+        factory.destroy = function(scope) {
             token = null;
             xsrfToken = null;
             delete $cookies[scope.client];
@@ -439,12 +452,12 @@
 
         /**
          * @ngdoc method
-         * @name Oauth_AccessToken#expired
+         * @name appverse.security.factory:Oauth_AccessToken#expired
+         * @methodOf appverse.security.factory:Oauth_AccessToken
          * @description Tells when the access token is expired.
-         *
          * @returns {boolean} True or false if the token is expired
          */
-        factory.expired = function () {
+        factory.expired = function() {
             return (token && token.expires_at && token.expires_at < new Date());
         };
 
@@ -463,7 +476,7 @@
             var token = getTokenFromString($location.hash());
 
             if (token) {
-                removeFragment();
+                removeFragment($location.hash());
                 setToken(token, scope);
             }
         }
@@ -478,20 +491,20 @@
 
 
         function getXSRFTokenFromCache() {
-                var user = UserService.getCurrentUser();
-                if (user) {
-                    xsrfToken = user.xsrfToken;
-                }
+            var user = UserService.getCurrentUser();
+            if (user) {
+                xsrfToken = user.xsrfToken;
             }
-            /**
-             * @ngdoc method
-             * @name appverse.security.factory:Oauth_AccessToken#getTokenFromString
-             * @methodOf appverse.security.factory:Oauth_AccessToken
-             * @param {object} hash The initial string
-             * @description
-             * Parse the fragment URI into an object
-             * @returns {object} The value of the token
-             */
+        }
+        /**
+         * @ngdoc method
+         * @name appverse.security.factory:Oauth_AccessToken#getTokenFromString
+         * @methodOf appverse.security.factory:Oauth_AccessToken
+         * @param {object} hash The initial string
+         * @description
+         * Parse the fragment URI into an object
+         * @returns {object} The value of the token
+         */
         function getTokenFromString(hash) {
             var splitted = hash.split('&');
             var params = {};
@@ -607,25 +620,40 @@
          * @ngdoc method
          * @name appverse.security.factory:Oauth_AccessToken#removeFragment
          * @methodOf appverse.security.factory:Oauth_AccessToken
-         * @param {object} scope The current scope
+         * @param {object} hash The initial string
          * @description
          * Remove the fragment URI
          */
-        function removeFragment() {
-            //TODO we need to let the fragment live if it's not the access token
-            $location.hash('');
+        function removeFragment(hash) {
+
+            var splitted = hash.split('&');
+            var token;
+
+            for (var i = 0; i < splitted.length; i++) {
+                var param = splitted[i].split('=');
+                var key = param[0];
+                var value = param[1];
+                if (key == 'access_token') {
+                    token = value;
+                }
+            }
+            var base = hash.substring(0, hash.lastIndexOf("?")+1);
+            var fragment = base + 'access_token=' + token;
+            $location.hash(fragment);
+            $log.debug('OauthAccessTokenFactory.removeFragment: hash' + $location.hash());
+
         }
 
 
         return factory;
     }
-    OauthAccessTokenFactory.$inject = ["$location", "$cookies", "UserService"];
 
 })();
 
 (function() {
     'use strict';
 
+    OauthEndpointFactory.$inject = ["$location", "$log"];
     angular.module('appverse.security').factory('Oauth_Endpoint', OauthEndpointFactory);
 
     /**
@@ -638,26 +666,10 @@
      *
      * @requires https://docs.angularjs.org/api/ng/service/$location $location
      */
-    function OauthEndpointFactory ($location) {
+    function OauthEndpointFactory($location, $log) {
 
         var factory = {};
         var url;
-
-        //TODO Check against other oauth providers (linkedin, twitter).
-
-        /*
-         *NOTE
-         *Google uses the same url for authentication and authorization, so just
-         *redirect your users to the authorize url with the appropriate parameters in
-         *the query string. Google then determines if the user needs to login,
-         *authorize your app, or both.
-         *The flow would go something like this...
-         *1-Get the request token
-         *2-Redirect your users to the authorization link
-         *https://www.google.com/accounts/OAuthAuthorizeToken?scope=http%3A%2F%2Fwww.google.com%2Fm8%2Ffeeds&oauth_token=REQUEST_TOKEN&oauth_callback=http%3A%2F%2Fwww.mysite.com%2Fcallback
-         *3-User authorizes your app, then exchange the request token for an access token.
-         */
-
 
         /**
          * @ngdoc method
@@ -667,7 +679,8 @@
          * @param {object} scope The current scope
          * @returns {String} The URL for the oauth endpoint
          */
-        factory.set = function (scope) {
+        factory.set = function(scope) {
+            $log.debug('OauthEndpointFactory.set');
             url = scope.site +
                 scope.authorizePath +
                 '?response_type=token' + '&' +
@@ -679,14 +692,15 @@
             return url;
         };
 
-        /**
+      /**
          * @ngdoc method
          * @name Oauth_Endpoint#get
          * @description Returns the authorization URL.
          *
          * @returns {String} The URL for the oauth endpoint
          */
-        factory.get = function () {
+        factory.get = function() {
+            $log.debug('OauthAccessTokenFactory.get');
             return url;
         };
 
@@ -695,18 +709,21 @@
          * @name Oauth_Endpoint#redirect
          * @description Redirects the app to the authorization URL.
          */
-        factory.redirect = function () {
+        factory.redirect = function() {
+            $log.debug('OauthAccessTokenFactory.redirect');
+
             window.location.replace(url);
         };
 
         return factory;
     }
-    OauthEndpointFactory.$inject = ["$location"];
 
 })();
-(function() {
+
+(function () {
     'use strict';
 
+    OauthProfileFactory.$inject = ["Oauth_RequestWrapper", "Restangular"];
     angular.module('appverse.security').factory('Oauth_Profile', OauthProfileFactory);
 
     /**
@@ -719,18 +736,17 @@
      * @requires https://docs.angularjs.org/api/ng/service/$resource $resource
      * @requires SECURITY_OAUTH
      */
-    function OauthProfileFactory(Oauth_RequestWrapper, $resource, SECURITY_OAUTH) {
-        var resource = $resource(SECURITY_OAUTH.profile, {}, {
-            //get: { method: 'JSONP', params: { callback: 'JSON_CALLBACK' } }
-        });
-        return Oauth_RequestWrapper.wrapRequest(resource, ['get']);
+    function OauthProfileFactory(Oauth_RequestWrapper, Restangular) {
+
+        return Oauth_RequestWrapper.wrapRequest(Restangular);
     }
-    OauthProfileFactory.$inject = ["Oauth_RequestWrapper", "$resource", "SECURITY_OAUTH"];
 
 })();
+
 (function () {
     'use strict';
 
+    OauthRequestWrapperFactory.$inject = ["$log", "$browser", "Oauth_AccessToken", "REST_CONFIG", "SECURITY_GENERAL"];
     angular.module('appverse.security').factory('Oauth_RequestWrapper', OauthRequestWrapperFactory);
 
     /**
@@ -760,6 +776,7 @@
          * @returns {object} the modified Restangular object
          */
         factory.wrapRequest = function (restangular) {
+          $log.debug('OauthRequestWrapperFactory.wrapRequest');
 
             var token = Oauth_AccessToken.get();
             var wrappedRestangular = restangular;
@@ -787,6 +804,8 @@
          * @param {object} wrappedRestangular The Restangular object
          */
         function setRequestHeaders(token, wrappedRestangular) {
+          $log.debug('OauthRequestWrapperFactory.setRequestHeaders');
+
             $log.debug('token: ' + token);
             $log.debug('is same domain? ' + isSameDomain(REST_CONFIG.BaseUrl, $browser.url()));
 
@@ -839,7 +858,6 @@
 
         return factory;
     }
-    OauthRequestWrapperFactory.$inject = ["$log", "$browser", "Oauth_AccessToken", "REST_CONFIG", "SECURITY_GENERAL"];
 
 
     /**
@@ -880,202 +898,218 @@
 
 })();
 
-(function() {
-  'use strict';
+(function () {
+    'use strict';
 
-  angular.module('appverse.security')
+    angular.module('appverse.security')
 
-  /**
-   * @ngdoc directive
-   * @name appverse.security.directive:oauth
-   * @description
-   * Oauth Login Directive.
-   * You can use the directive with or without data in the directive declaration.
-   * If data are not included they will be loaded from configuration files.
-   * Data in declaration overwrites data from configuration files.
-   *
-   * @restrict B
-   * @requires SECURITY_OAUTH
-   * @requires Oauth_AccessToken
-   * @requires Oauth_Endpoint
-   * @requires Oauth_Profile
-   * @requires https://docs.angularjs.org/api/ng/service/$location $location
-   * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
-   * @requires https://docs.angularjs.org/api/ng/service/$compile $compile
-   * @requires https://docs.angularjs.org/api/ng/service/$http $http
-   * @requires https://docs.angularjs.org/api/ng/service/$templateCache $templateCache
-   *
-   * @example
-   <example module="appverse.security">
-      <file name="index.html">
-          <p>OAuth test</p>
-          <oauth ng-cloak
-              site="http://myoauthserver.com"
-              client="e72c43c75adc9665e4d4c13354c41f337d5a2e439d3da1243bb47e39745f435c"
-              redirect="http://localhost:9000"
-              scope="resources"
-              profile="http://myoauthserver.com/me"
-              storage="cookies">Sign In
-          </oauth>
-      </file>
-  </example>
+    /**
+     * @ngdoc directive
+     * @name appverse.security.directive:oauth
+     * @description
+     * Oauth Login Directive.
+     * You can use the directive with or without data in the directive declaration.
+     * If data are not included they will be loaded from configuration files.
+     * Data in declaration overwrites data from configuration files.
+     *
+     * @restrict B
+     * @requires SECURITY_OAUTH
+     * @requires Oauth_AccessToken
+     * @requires Oauth_Endpoint
+     * @requires Oauth_Profile
+     * @requires https://docs.angularjs.org/api/ng/service/$location $location
+     * @requires https://docs.angularjs.org/api/ng/service/$rootScope $rootScope
+     * @requires https://docs.angularjs.org/api/ng/service/$compile $compile
+     * @requires https://docs.angularjs.org/api/ng/service/$http $http
+     * @requires https://docs.angularjs.org/api/ng/service/$templateCache $templateCache
+     *
+     * @example
+     <example module="appverse.security">
+        <file name="index.html">
+            <p>OAuth test</p>
+            <oauth ng-cloak
+                site="http://myoauthserver.com"
+                client="e72c43c75adc9665e4d4c13354c41f337d5a2e439d3da1243bb47e39745f435c"
+                redirect="http://localhost:9000"
+                scope="resources"
+                profile="http://myoauthserver.com/me"
+                storage="cookies">Sign In
+            </oauth>
+        </file>
+    </example>
 
-   * Note ng-cloak directive (http://docs.angularjs.org/api/ng.directive:ngCloak)
-   * is used to prevent the Angular html template from being briefly displayed by
-   * the browser in its raw (uncompiled) form while your application is loading.
-   */
-  .directive('oauth', ['SECURITY_OAUTH', 'Oauth_AccessToken', 'Oauth_Endpoint', 'Oauth_Profile' ,'$rootScope', '$compile', '$http', '$templateCache',
-    function(SECURITY_OAUTH, AccessToken, Endpoint, Profile, $rootScope, $compile, $http, $templateCache) {
+     * Note ng-cloak directive (http://docs.angularjs.org/api/ng.directive:ngCloak)
+     * is used to prevent the Angular html template from being briefly displayed by
+     * the browser in its raw (uncompiled) form while your application is loading.
+     */
+    .directive('oauth', ['SECURITY_OAUTH', 'Oauth_AccessToken', 'Oauth_Endpoint', 'Oauth_Profile', '$rootScope', '$compile', '$http', '$templateCache', '$log',
+    function (SECURITY_OAUTH, AccessToken, Endpoint, Profile, $rootScope, $compile, $http, $templateCache, $log) {
 
-    var definition = {
-      restrict: 'AE',
-      replace: false,
-      scope: {
-        site: '@',       // (required) set the oauth2 server host
-        client: '@',     // (required) client id
-        redirect: '@',   // (required) client redirect uri
-        scope: '@',      // (optional) scope
-        flow: '@',       // (required) flow (e.g password, implicit)
-        view: '@',       // (optional) view (e.g standard, popup)
-        storage: '@',    // (optional) storage (e.g none, cookies)
-        profile: '@',    // (optional) user info URL
-        template: '@'    // (optional) template to render
-      }
-    };
+            var definition = {
+                restrict: 'AE',
+                replace: false,
+                scope: {
+                    site: '@', // (required) set the oauth2 server host
+                    client: '@', // (required) client id
+                    redirect: '@', // (required) client redirect uri
+                    scope: '@', // (optional) scope
+                    flow: '@', // (required) flow (e.g password, implicit)
+                    view: '@', // (optional) view (e.g standard, popup)
+                    storage: '@', // (optional) storage (e.g none, cookies)
+                    profile: '@', // (optional) user info URL
+                    template: '@' // (optional) template to render
+                }
+            };
 
-    definition.link = function postLink(scope, element, attrs) {
-      scope.show = 'none';
+            definition.link = function postLink(scope, element) {
+                scope.show = 'none';
 
-      scope.$watch('client', function(value) {
-        init();                    // set defaults
-        compile();                 // gets the template and compile the desired layout
-        Endpoint.set(scope);       // set the oauth client url for authorization
-        AccessToken.set(scope);    // set the access token object (from fragment or cookies)
-        initProfile();             // get the profile info
-        initView();                // set the actual visualization status for the widget
-      });
+                scope.$watch('client', function () {
+                    init(); // set defaults
+                    compile(); // gets the template and compile the desired layout
+                    Endpoint.set(scope); // set the oauth client url for authorization
+                    AccessToken.set(scope); // set the access token object (from fragment or cookies)
+                    initProfile(); // get the profile info
+                    initView(); // set the actual visualization status for the widget
+                });
 
 
-      /**
-       * @function
-       * @description set defaults into the scope object
-       */
-     function init () {
-        scope.site          = scope.site || SECURITY_OAUTH.scopeURL;
-        scope.clientID      = scope.clientID || SECURITY_OAUTH.clientID;
-        scope.redirect      = scope.redirect || SECURITY_OAUTH.redirect;
-        scope.scope         = scope.scope || SECURITY_OAUTH.scope;
-        scope.flow          = scope.flow || SECURITY_OAUTH.flow;
-        scope.view          = scope.view || SECURITY_OAUTH.view;
-        scope.storage       = scope.storage || SECURITY_OAUTH.storage;
-        scope.scope         = scope.scope || SECURITY_OAUTH.scope;
-        scope.authorizePath = scope.authorizePath || SECURITY_OAUTH.scope_authorizePath;
-        scope.tokenPath     = scope.tokenPath || SECURITY_OAUTH.scope_tokenPath;
-        scope.template      = scope.template || SECURITY_OAUTH.scope_template;
-      }
+                /**
+                 * @function
+                 * @description set defaults into the scope object
+                 */
+                function init() {
+                    $log.debug('oauth.init: ');
 
-      /**
-       * @function
-       * @description
-       * Gets the template and compile the desired layout.
-       * Based on $compile, it compiles a piece of HTML string or DOM into the retrieved
-       * template and produces a template function, which can then be used to link scope and
-       * the template together.
-       */
-      function compile () {
-        $http.get(scope.template, {
-            //This allows you can get the template again by consuming the
-            //$templateCache service directly.
-            cache: $templateCache
-        })
-        .success(function(html) {
-          element.html(html);
-          $compile(element.contents())(scope);
-        });
-      };
+                    scope.site = scope.site || SECURITY_OAUTH.scopeURL;
+                    scope.clientID = scope.clientID || SECURITY_OAUTH.clientID;
+                    scope.redirect = scope.redirect || SECURITY_OAUTH.redirect;
+                    scope.scope = scope.scope || SECURITY_OAUTH.scope;
+                    scope.flow = scope.flow || SECURITY_OAUTH.flow;
+                    scope.view = scope.view || SECURITY_OAUTH.view;
+                    scope.storage = scope.storage || SECURITY_OAUTH.storage;
+                    scope.scope = scope.scope || SECURITY_OAUTH.scope;
+                    scope.authorizePath = scope.authorizePath || SECURITY_OAUTH.scope_authorizePath;
+                    scope.tokenPath = scope.tokenPath || SECURITY_OAUTH.scope_tokenPath;
+                    scope.template = scope.template || SECURITY_OAUTH.scope_template;
+                }
 
-      /**
-       * @function
-       * @description
-       * Gets the profile info.
-       */
-      function initProfile () {
-        var token = AccessToken.get();
-        if (token && token.access_token && SECURITY_OAUTH.profile)
-          scope.profile = Profile.get();
-      }
+                /**
+                 * @function
+                 * @description
+                 * Gets the template and compile the desired layout.
+                 * Based on $compile, it compiles a piece of HTML string or DOM into the retrieved
+                 * template and produces a template function, which can then be used to link scope and
+                 * the template together.
+                 */
+                function compile() {
+                    $log.debug('oauth.compile');
 
-      /**
-       * @function
-       * @description
-       * Sets the actual visualization status for the widget.
-       */
-      function initView (token) {
-        var token = AccessToken.get();
-        // There is not token: without access token it's logged out
-        if (!token)             {
-            return loggedOut()
-        }
-        // The request exists: if there is the access token we are done
-        if (token.access_token) {
-            return loggedIn()
-        }
-        // The request is denied: if the request has been denied we fire the denied event
-        if (token.error)        {
-            return denied()
-        }
-      }
+                    $http.get(scope.template, {
+                            //This allows you can get the template again by consuming the
+                            //$templateCache service directly.
+                            cache: $templateCache
+                        })
+                        .success(function (html) {
+                            element.html(html);
+                            $compile(element.contents())(scope);
+                        });
+                }
 
-      scope.login = function() {
-        Endpoint.redirect();
-      }
+                /**
+                 * @function
+                 * @description
+                 * Gets the profile info.
+                 */
+                function initProfile() {
+                    $log.debug('oauth.initProfile');
 
-      scope.logout = function() {
-        AccessToken.destroy(scope);
-        loggedOut();
-      }
+                    var token = AccessToken.get();
+                    if (token && token.access_token && SECURITY_OAUTH.profile) {
+                        scope.profile = Profile.get();
+                    }
+                }
 
-      /**
-       * @function
-       * @description
-       */
-      function loggedIn(){
-        $rootScope.$broadcast('oauth:success', AccessToken.get());
-        scope.show = 'logout';
-      }
+                /**
+                 * @function
+                 * @description
+                 * Sets the actual visualization status for the widget.
+                 */
+                function initView() {
+                    $log.debug('oauth.initView');
 
-      /**
-       * @function
-       * @description
-       */
-      function loggedOut () {
-        $rootScope.$broadcast('oauth:logout');
-        scope.show = 'login';
-      }
+                    var token = AccessToken.get();
+                    // There is not token: without access token it's logged out
+                    if (!token) {
+                        return loggedOut();
+                    }
+                    // The request exists: if there is the access token we are done
+                    if (token.access_token) {
+                        return loggedIn();
+                    }
+                    // The request is denied: if the request has been denied we fire the denied event
+                    if (token.error) {
+                        return denied();
+                    }
+                }
 
-      /**
-       * @function
-       * @description
-       */
-      function denied(){
-        scope.show = 'denied';
-        $rootScope.$broadcast('oauth:denied');
-      }
+                scope.login = function () {
+                    $log.debug('oauth.scope.login');
+                    Endpoint.redirect();
+                };
 
-      scope.$on('oauth:template', function(event, template) {
-        scope.template = template;
-        compile(scope);
-      });
-    };
+                scope.logout = function () {
+                    $log.debug('oauth.scope.logout');
+                    AccessToken.destroy(scope);
+                    loggedOut();
+                };
 
-    return definition;
+                /**
+                 * @function
+                 * @description
+                 */
+                function loggedIn() {
+                    $log.debug('oauth.loggedIn');
+                    $rootScope.$broadcast('oauth:success', AccessToken.get());
+                    scope.show = 'logout';
+                }
+
+                /**
+                 * @function
+                 * @description
+                 */
+                function loggedOut() {
+                    $log.debug('oauth.loggedOut');
+                    $rootScope.$broadcast('oauth:logout');
+                    scope.show = 'login';
+                }
+
+                /**
+                 * @function
+                 * @description
+                 */
+                function denied() {
+                    $log.debug('oauth.denied');
+                    scope.show = 'denied';
+                    $rootScope.$broadcast('oauth:denied');
+                }
+
+                scope.$on('oauth:template', function (event, template) {
+                    scope.template = template;
+                    compile(scope);
+                });
+            };
+
+            return definition;
   }]);
 
 
 })();
+
 (function () {
     'use strict';
 
+    RoleServiceFactory.$inject = ["$log", "AUTHORIZATION_DATA", "avCacheFactory", "UserService", "SECURITY_GENERAL", "$location"];
     angular.module('appverse.security').factory('RoleService', RoleServiceFactory);
 
     /**
@@ -1086,9 +1120,9 @@
      *
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
      * @requires AUTHORIZATION_DATA
-     * @requires CacheFactory
+     * @requires avCacheFactory
      */
-    function RoleServiceFactory($log, AUTHORIZATION_DATA, CacheFactory) {
+    function RoleServiceFactory($log, AUTHORIZATION_DATA, avCacheFactory, UserService, SECURITY_GENERAL, $location) {
 
         return {
 
@@ -1100,7 +1134,7 @@
              * @returns {boolean} True if the role of the usder has admin previleges
              */
             validateRoleAdmin: function () {
-                var roles = CacheFactory._browserCache.get('loggedUser').roles;
+                var roles = avCacheFactory._browserCache.get('loggedUser').roles;
                 $log.debug('roles in session: ' + roles);
 
                 var result;
@@ -1128,23 +1162,51 @@
              * @returns {boolean} True if the user has that role
              */
             validateRoleInUserOther: function (role) {
-                var user = CacheFactory._browserCache.get('loggedUser');
+                var user = avCacheFactory._browserCache.get('loggedUser');
                 if (user) {
                     return _.contains(role, user.roles);
                 } else {
                     return false;
                 }
 
+            },
+
+            /**
+             * @ngdoc method
+             * @name appverse.security.factory:RoleService#validateRoleInUserOther
+             * @description Check if the passed user has a given role
+             *
+             * @param {string} role The role to be validated
+             * @returns {boolean} True if the user has that role
+             */
+            isRouteAllowed: function () {
+
+                if (!SECURITY_GENERAL.routes) {
+                    return true;
+                }
+
+                var rolesAllowed = SECURITY_GENERAL.routes[$location.path()];
+
+                if (rolesAllowed) {
+                    var user = UserService.getCurrentUser();
+                    if (user) {
+                        return _.intersection(user.roles, rolesAllowed).length > 0;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
             }
         };
     }
-    RoleServiceFactory.$inject = ["$log", "AUTHORIZATION_DATA", "CacheFactory"];
 
 })();
 
 (function () {
     'use strict';
 
+    UserServiceFactory.$inject = ["$log", "avCacheFactory"];
     angular.module('appverse.security').factory('UserService', UserServiceFactory);
 
     /**
@@ -1156,11 +1218,13 @@
      * Handles the user in the app.
      *
      * @requires https://docs.angularjs.org/api/ng/service/$log $log
-     * @requires CacheFactory
+     * @requires avCacheFactory
      */
-    function UserServiceFactory($log, CacheFactory) {
+    function UserServiceFactory($log, avCacheFactory) {
 
         return {
+            USER_CACHE_NAME: 'loggedUser',
+            _currentUser: null,
             /**
              * @ngdoc method
              * @name UserService#setCurrentUser
@@ -1168,17 +1232,15 @@
              *
              * @param {object} loggedUser The currently logged user
              */
-            setCurrentUser: function (loggedUser) {
+            setCurrentUser: function (user) {
 
-                CacheFactory._browserCache.put('loggedUser', {
-                    username: loggedUser.name,
-                    roles: loggedUser.roles,
-                    bToken: loggedUser.bToken,
-                    xsrfToken: loggedUser.xsrfToken,
-                    isLogged: loggedUser.isLogged
-                });
+                var newUser = new User(user.name, user.roles, user.bToken, user.xsrfToken, user.isLogged);
 
-                $log.debug('New user has been stored to cache.');
+                avCacheFactory._browserCache.put(this.USER_CACHE_NAME, newUser);
+
+                $log.debug('New user has been stored to browser cache.');
+
+                this._currentUser = newUser;
             },
             /**
              * @ngdoc method
@@ -1187,10 +1249,17 @@
              * @returns {appverse.security.global:User} The currently logged user
              */
             getCurrentUser: function () {
-                var loggedUser = CacheFactory._browserCache.get('loggedUser');
+                if (this._currentUser) {
+                    return this._currentUser;
+                } else {
+                    var user = avCacheFactory._browserCache.get(this.USER_CACHE_NAME);
 
-                if (loggedUser && loggedUser.isLogged) {
-                    return new User(loggedUser.username, loggedUser.roles, loggedUser.bToken, loggedUser.xsrfToken, loggedUser.isLogged);
+                    if (user && user.isLogged) {
+                        this._currentUser = user;
+                        return user;
+                    } else {
+                        return null;
+                    }
                 }
             },
             /**
@@ -1199,11 +1268,12 @@
              * @description Removes the current user from the app, including cache.
              */
             removeUser: function () {
-                CacheFactory._browserCache.remove('loggedUser');
+                this._currentUser = null;
+                avCacheFactory._browserCache.remove(this.USER_CACHE_NAME);
+                $log.debug('User has been removed from browser cache.');
             }
         };
     }
-    UserServiceFactory.$inject = ["$log", "CacheFactory"];
 
 
     /**
