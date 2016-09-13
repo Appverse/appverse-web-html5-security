@@ -12,7 +12,7 @@ module.exports = function (config) {
             'bower_components/angular/angular.js',
             'bower_components/angular-cookies/angular-cookies.min.js',
             'bower_components/angular-resource/angular-resource.min.js',
-            'bower_components/lodash/lodash.min.js',
+            'bower_components/lodash/dist/lodash.min.js',
 
             'bower_components/appverse-web-html5-core/dist/appverse/appverse.js',
             'bower_components/appverse-web-html5-core/dist/appverse-utils/appverse-utils.js',
