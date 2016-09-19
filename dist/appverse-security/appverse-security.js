@@ -155,7 +155,6 @@
 
                     // Retrieves bearer/oauth token from header
                     var tokenInHeader = response.headers('X-XSRF-Cookie');
-                    $log.debug('oauthResponseInterceptor X-XSRF-Cookie: ' + tokenInHeader);
                     if (tokenInHeader) {
                         $injector.get('Oauth_AccessToken').setFromHeader(tokenInHeader);
                     }
